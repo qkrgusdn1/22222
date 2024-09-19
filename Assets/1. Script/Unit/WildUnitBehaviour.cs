@@ -1,18 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 
 public class WildUnitBehaviour : UnitBehaviour
 {
     public override void EnterState(UnitState unitState)
     {
+        Debug.Log($"Entering state: {unitState}");
         if (unitState == UnitState.Idle)
         {
             unit.agent.isStopped = true;
         }
         if (unitState == UnitState.Approach)
         {
-            //*******코드 삭제됨*******
             unit.agent.isStopped = false;
         }
         else if (unitState == UnitState.Attack)
@@ -30,6 +31,7 @@ public class WildUnitBehaviour : UnitBehaviour
 
     public override void UpdateState(UnitState state)
     {
+        Debug.Log($"UpdateState: {state}");
         if (unit.unitState == UnitState.Idle)
         {
             UpdateIdleState();
@@ -79,16 +81,19 @@ public class WildUnitBehaviour : UnitBehaviour
 
     void UpdateIdleState() //Idle 행동 - 어떤 활동 필요?
     {
+        Debug.Log("UpdateIdleState");
         float disTarget = Vector3.Distance(unit.target.transform.position, transform.position);
         if (disTarget <= unit.targetingRange)
         {
-            EnterState(UnitState.Approach);
+            Debug.Log("UpdateApproachState");
+            unit.EnterState(UnitState.Approach);
             return;
         }
     }
 
     void UpdateApproachState()
     {
+        Debug.Log("UpdateApproachState");
         //어떤 코드가 필요한가요?
 
         //타겟이 null일때 , 멀때 -> Idle
@@ -96,7 +101,7 @@ public class WildUnitBehaviour : UnitBehaviour
 
         if (unit.target == null)
         {
-            EnterState(UnitState.Idle);
+            unit.EnterState(UnitState.Idle);
             return;
         }
 
@@ -104,12 +109,12 @@ public class WildUnitBehaviour : UnitBehaviour
         float disTarget = Vector3.Distance(unit.target.transform.position, transform.position);
         if (disTarget > unit.targetingRange)
         {
-            EnterState(UnitState.Idle);
+            unit.EnterState(UnitState.Idle);
             return;
         }
         else if (disTarget <= unit.attackRange)
         {
-            EnterState(UnitState.Attack);
+            unit.EnterState(UnitState.Attack);
         }
 
         //******* 수정된 코드 ********
@@ -125,19 +130,21 @@ public class WildUnitBehaviour : UnitBehaviour
 
     void UpdateAttackState()
     {
+        Debug.Log("UpdateAttackState");
         if (unit.endAttack)
         {
             unit.attackTimer -= Time.deltaTime;
 
             if (unit.attackTimer <= 0)
             {
-                EnterState(UnitState.Idle);
+                unit.EnterState(UnitState.Idle);
             }
         }
     }
 
     void UpdateKnockDownState()
     {
+        Debug.Log("UpdateKnockDownState");
         Collider[] colliders = Physics.OverlapSphere(unit.rangePoint.transform.position, unit.knockDownRange, unit.targetLayer);
 
         bool isPlayerInRange = false;

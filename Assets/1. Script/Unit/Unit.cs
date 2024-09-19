@@ -32,12 +32,12 @@ public class Unit : MonoBehaviour
     public float maxHp;
     public Image hpBar;
     public Image hpBarBg;
-
+    public Image hpBarSecondImage;
     public UnitState unitState;
 
     public GameObject catchBarBgImage;
     public Image catchBarImage;
-
+    
 
     private void OnDrawGizmosSelected()
     {
@@ -53,7 +53,6 @@ public class Unit : MonoBehaviour
 
     private void Awake()
     {
-        unitBehaviours = GetComponentsInChildren<UnitBehaviour>();
         for(int i = 0; i < unitBehaviours.Length; i++)
         {
             unitBehaviours[i].InitUnit(this);
@@ -77,6 +76,7 @@ public class Unit : MonoBehaviour
 
     private void OnEnable()
     {
+        unitBehaviours = GetComponentsInChildren<UnitBehaviour>();
         curUnitBehaviour = GetUnitBehaviour(UnitBehaviourType.Wild);
 
         catchBarImage.fillAmount = 0;
@@ -86,11 +86,12 @@ public class Unit : MonoBehaviour
         animator.SetBool("IsKnockDown", false);
     }
 
-    public void EnterState(UnitState state)
+    public virtual void EnterState(UnitState state)
     {
+        
         if (unitState == state)
             return;
-
+        
         unitState = state;
 
         curUnitBehaviour.EnterState(state);
@@ -114,6 +115,20 @@ public class Unit : MonoBehaviour
     {
         curUnitBehaviour.UpdateState(unitState);
     }
+    private IEnumerator CoSmoothHpBar(float targetFillAmount, float duration)
+    {
+        float elapsedTime = 0f;
+        float startFillAmount = hpBarSecondImage.fillAmount;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            hpBarSecondImage.fillAmount = Mathf.Lerp(startFillAmount, targetFillAmount, elapsedTime / duration);
+            yield return null;
+        }
+
+        hpBarSecondImage.fillAmount = targetFillAmount;
+    }
 
     public void TakeDamage(float damage)
     {
@@ -125,8 +140,9 @@ public class Unit : MonoBehaviour
             EnterState(UnitState.KnockDown);
         }
 
-
+        
         hpBar.fillAmount = hp / maxHp;
+        StartCoroutine(CoSmoothHpBar(hpBar.fillAmount, 1));
         if (hp <= 0)
         {
             Destroy(gameObject);
