@@ -36,7 +36,7 @@ public class Weapon : MonoBehaviour
             if (!hittedList.Contains(colliders[i].gameObject))
             {
                 hittedList.Add(colliders[i].gameObject);
-                owner.Attack(colliders[i].gameObject.GetComponent<Enemy>(), damage);
+                owner.Attack(colliders[i].gameObject.GetComponent<Unit>(), damage);
             }
         }
 

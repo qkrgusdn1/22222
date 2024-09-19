@@ -42,7 +42,7 @@ public class Player : MonoBehaviour
     public bool isGrounded;
     public LayerMask groundLayer;
     public LayerMask itemLayer;
-    public LayerMask enemyLayer;
+    public LayerMask unitLayer;
     Rigidbody rb;
     public float checkPickUpRange;
 
@@ -66,7 +66,7 @@ public class Player : MonoBehaviour
     public float maxStopAttackTime;
 
 
-    public Enemy catchTarget;
+    public Unit catchTarget;
 
     float catchTimer;
     public float maxCatchTimer;
@@ -92,7 +92,7 @@ public class Player : MonoBehaviour
         Cursor.visible = false;
     }
 
-    public void Attack(Enemy target, float damage)
+    public void Attack(Unit target, float damage)
     {
         if (target != null)
             target.TakeDamage(damage);
@@ -177,16 +177,16 @@ public class Player : MonoBehaviour
                 }
             }
 
-            cols = Physics.OverlapSphere(transform.position, checkPickUpRange, enemyLayer);
+            cols = Physics.OverlapSphere(transform.position, checkPickUpRange, unitLayer);
             Debug.Log(cols.Length);
             if (cols.Length >= 1)
             {
                 foreach (Collider col in cols)
                 {
-                    Enemy enemy = col.GetComponent<Enemy>();
-                    if (enemy.enemyState == EnemyState.KnockDown)
+                    Unit unit = col.GetComponent<Unit>();
+                    if (unit.unitState == UnitState.KnockDown)
                     {
-                        catchTarget = enemy;
+                        catchTarget = unit;
                         catchTimer = 0;
                         break;
                     }
@@ -197,21 +197,21 @@ public class Player : MonoBehaviour
         {
             if (catchTarget != null)
             {
-                Dictionary<EnemyType, float> enemyTimers = new Dictionary<EnemyType, float>
+                Dictionary<UnitType, float> unitTimers = new Dictionary<UnitType, float>
                 {
-                    { EnemyType.oneStar, GameMgr.Instance.maxOneStarTimer },
-                    { EnemyType.twoStar, GameMgr.Instance.maxTwoStarTimer },
-                    { EnemyType.threeStar, GameMgr.Instance.maxThreeStarTimer }
+                    { UnitType.oneStar, GameMgr.Instance.maxOneStarTimer },
+                    { UnitType.twoStar, GameMgr.Instance.maxTwoStarTimer },
+                    { UnitType.threeStar, GameMgr.Instance.maxThreeStarTimer }
                 };
 
-                if (catchTimer >= enemyTimers[catchTarget.enemyType])
+                if (catchTimer >= unitTimers[catchTarget.unitType])
                 {
                     catchTarget.catchBarImage.fillAmount = 1;
                     Catch(catchTarget);
                 }
                 else
                 {
-                    catchTarget.catchBarImage.fillAmount = catchTimer / enemyTimers[catchTarget.enemyType];
+                    catchTarget.catchBarImage.fillAmount = catchTimer / unitTimers[catchTarget.unitType];
                 }
                 catchTimer += Time.deltaTime;
 
@@ -274,15 +274,15 @@ public class Player : MonoBehaviour
     }
 
 
-    void Catch(Enemy enemy)
+    void Catch(Unit unit)
     {
-        enemy.friendly = true;
-        enemy.hp = catchTarget.maxHp;
-        enemy.catchBarBgImage.SetActive(false);
-        enemy.hpBar.fillAmount = 1;
-        enemy.EnterState(EnemyState.Idle);
-        enemy.animator.SetBool("IsKnockDown", false);
-        enemy.agent.isStopped = false;
+        unit.friendly = true;
+        unit.hp = catchTarget.maxHp;
+        unit.catchBarBgImage.SetActive(false);
+        unit.hpBar.fillAmount = 1;
+        unit.EnterState(UnitState.Idle);
+        unit.animator.SetBool("IsKnockDown", false);
+        unit.agent.isStopped = false;
         catchTarget = null;
     }
 
