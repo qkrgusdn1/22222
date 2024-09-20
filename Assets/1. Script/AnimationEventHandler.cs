@@ -10,6 +10,7 @@ public class AnimationEventHandler : MonoBehaviour
     public Action finishAttackListener;
     public Action startRollListener;
     public Action endRollListener;
+    public Action dieListener;
     public void StartAttack()
     {
         startAttackListener?.Invoke();
@@ -29,5 +30,9 @@ public class AnimationEventHandler : MonoBehaviour
     public void EndRoll()
     {
         endRollListener?.Invoke();
+    }
+    public void Die()
+    {
+        dieListener?.Invoke();
     }
 }

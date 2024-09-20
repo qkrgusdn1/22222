@@ -37,6 +37,8 @@ public class Unit : MonoBehaviour
 
     public GameObject catchBarBgImage;
     public Image catchBarImage;
+
+    public AnimationEventHandler animationEventHandler;
     
 
     private void OnDrawGizmosSelected()
@@ -57,6 +59,7 @@ public class Unit : MonoBehaviour
         {
             unitBehaviours[i].InitUnit(this);
         }
+        animationEventHandler.dieListener += Die;
         rb = GetComponent<Rigidbody>();
         agent = GetComponent<NavMeshAgent>();
         agent.speed = moveSpeed;
@@ -111,6 +114,11 @@ public class Unit : MonoBehaviour
     public LayerMask targetLayer;
    
 
+    void Die()
+    {
+        Destroy(gameObject);
+    }
+
     private void Update()
     {
         curUnitBehaviour.UpdateState(unitState);
@@ -145,7 +153,7 @@ public class Unit : MonoBehaviour
         StartCoroutine(CoSmoothHpBar(hpBar.fillAmount, 1));
         if (hp <= 0)
         {
-            Destroy(gameObject);
+            animator.Play("Die");
         }
     }
 
