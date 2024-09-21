@@ -5,6 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.AI;
 using UnityEditor;
+using static UnityEngine.UI.CanvasScaler;
 
 public class Unit : MonoBehaviour
 {
@@ -16,7 +17,7 @@ public class Unit : MonoBehaviour
     public bool friendly;
 
     public NavMeshAgent agent;
-    public Player target;
+    public GameObject target;
     public Rigidbody rb;
     public GameObject rangePoint;
 
@@ -63,7 +64,7 @@ public class Unit : MonoBehaviour
         {
             unitBehaviours[i].InitUnit(this);
         }
-        animationEventHandler.endAttackListener += EndAttack;
+        animationEventHandler.finishAttackListener += FinishAttack;
         animationEventHandler.dieListener += Die;
         rb = GetComponent<Rigidbody>();
         agent = GetComponent<NavMeshAgent>();
@@ -74,12 +75,12 @@ public class Unit : MonoBehaviour
     {
         if(type == UnitBehaviourType.Wild)
         {
-            targetLayer = LayerMask.NameToLayer("Friendly");
+            targetLayer = LayerMask.GetMask("Friendly");
             gameObject.layer = LayerMask.NameToLayer("Enemy");
         }
         else if(type == UnitBehaviourType.Reguler)
         {
-            targetLayer = LayerMask.NameToLayer("Enemy");
+            targetLayer = LayerMask.GetMask("Enemy");
             gameObject.layer = LayerMask.NameToLayer("Friendly");
         }
 
@@ -112,18 +113,28 @@ public class Unit : MonoBehaviour
             return;
         
         unitState = state;
-
         curUnitBehaviour.EnterState(state);
-       
+        if(state == UnitState.Idle)
+        {
+            target = null;
+        }
+        if(state == UnitState.Attack)
+        {
+            Attack();
+        }
     }
 
-
+    public void Attack()
+    {
+        animator.SetBool("IsRunning", false);
+        attackTimer = maxAttackTimer;
+        animator.Play("Attack" + attackAmount);
+    }
     
     //Attack 애니메이션이 끝나면 호출되는 함수!
-    public void EndAttack()
+    public void FinishAttack()
     {
         endAttack = true;
-        attackTimer = 0;
     }
 
    
