@@ -52,7 +52,7 @@ public class Player : MonoBehaviour
     [HideInInspector]
     public bool IsStop;
     bool noFinshAttack;
-    bool OnSlope;
+    bool onSlope;
 
     public float rollSpeed;
     private bool isRoll;
@@ -276,7 +276,8 @@ public class Player : MonoBehaviour
 
     void Catch(Unit unit)
     {
-        unit.friendly = true;
+        unit.curUnitBehaviour = unit.GetUnitBehaviour(UnitBehaviourType.Reguler);
+        unit.hpBar.color = Color.green;
         unit.hp = catchTarget.maxHp;
         unit.catchBarBgImage.SetActive(false);
         unit.hpBar.fillAmount = 1;
@@ -288,7 +289,7 @@ public class Player : MonoBehaviour
 
     private void OnCollisionStay(Collision collision)
     {
-        OnSlope = true;
+        onSlope = true;
         if ((groundLayer.value & (1 << collision.gameObject.layer)) > 0)
         {
             foreach (ContactPoint contact in collision.contacts)
@@ -297,7 +298,7 @@ public class Player : MonoBehaviour
                 {
                     isGrounded = true;
                     isJumping = false;
-                    OnSlope = false;
+                    onSlope = false;
                     break;
                 }
             }
@@ -366,7 +367,7 @@ public class Player : MonoBehaviour
 
     void Move()
     {
-        if (OnSlope) return;
+        if (onSlope) return;
 
         if (isRoll) return;
 

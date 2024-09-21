@@ -56,7 +56,7 @@ public class WildUnitBehaviour : UnitBehaviour
 
             if (distanceToPlayer <= unit.targetingRange)
             {
-                if (distanceToPlayer > unit.stoppingDistance)
+                if (distanceToPlayer > unit.attackRange)
                 {
                     unit.animator.SetBool("IsRunning", true);
                     unit.agent.isStopped = false;
@@ -64,6 +64,7 @@ public class WildUnitBehaviour : UnitBehaviour
                 else
                 {
                     unit.animator.SetBool("IsRunning", false);
+                    unit.endAttack = false;
                     unit.agent.isStopped = true;
                     unit.agent.velocity = new Vector3(0, unit.rb.velocity.y, 0);
                     unit.rb.velocity = new Vector3(0, unit.rb.velocity.y, 0);
@@ -114,6 +115,7 @@ public class WildUnitBehaviour : UnitBehaviour
         }
         else if (disTarget <= unit.attackRange)
         {
+            unit.attackTimer = unit.maxAttackTimer;
             unit.EnterState(UnitState.Attack);
         }
 
@@ -130,21 +132,22 @@ public class WildUnitBehaviour : UnitBehaviour
 
     void UpdateAttackState()
     {
-        Debug.Log("UpdateAttackState");
-        if (unit.endAttack)
+        if (!unit.endAttack)
         {
             unit.attackTimer -= Time.deltaTime;
 
             if (unit.attackTimer <= 0)
             {
+                unit.animator.Play("Attack" + unit.attackAmount);
+
                 unit.EnterState(UnitState.Idle);
+                return;
             }
         }
     }
 
     void UpdateKnockDownState()
     {
-        Debug.Log("UpdateKnockDownState");
         Collider[] colliders = Physics.OverlapSphere(unit.rangePoint.transform.position, unit.knockDownRange, unit.targetLayer);
 
         bool isPlayerInRange = false;
@@ -159,8 +162,7 @@ public class WildUnitBehaviour : UnitBehaviour
         }
         if (isPlayerInRange)
         {
-            if (!unit.friendly)
-                unit.catchBarBgImage.SetActive(true);
+            unit.catchBarBgImage.SetActive(true);
         }
         else
         {

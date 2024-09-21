@@ -26,7 +26,6 @@ public class Unit : MonoBehaviour
     public float targetingRange;
     public float attackRange;
     public float knockDownRange;
-    public float stoppingDistance;
 
     public float hp;
     public float maxHp;
@@ -39,17 +38,22 @@ public class Unit : MonoBehaviour
     public Image catchBarImage;
 
     public AnimationEventHandler animationEventHandler;
-    
+
+    public float attackTimer;
+    public float maxAttackTimer;
+    public bool endAttack;
+
+    public int attackAmount;
+
+    public LayerMask targetLayer;
 
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(rangePoint.transform.position, targetingRange);
-        Gizmos.color = Color.green;
-        Gizmos.DrawWireSphere(rangePoint.transform.position, stoppingDistance);
         Gizmos.color = Color.blue;
         Gizmos.DrawWireSphere(rangePoint.transform.position, knockDownRange);
-        Gizmos.color = Color.grey;
+        Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(rangePoint.transform.position, attackRange);
     }
 
@@ -59,14 +63,26 @@ public class Unit : MonoBehaviour
         {
             unitBehaviours[i].InitUnit(this);
         }
+        animationEventHandler.endAttackListener += EndAttack;
         animationEventHandler.dieListener += Die;
         rb = GetComponent<Rigidbody>();
         agent = GetComponent<NavMeshAgent>();
         agent.speed = moveSpeed;
     }
 
-    UnitBehaviour GetUnitBehaviour(UnitBehaviourType type)
+    public UnitBehaviour GetUnitBehaviour(UnitBehaviourType type)
     {
+        if(type == UnitBehaviourType.Wild)
+        {
+            targetLayer = LayerMask.NameToLayer("Friendly");
+            gameObject.layer = LayerMask.NameToLayer("Enemy");
+        }
+        else if(type == UnitBehaviourType.Reguler)
+        {
+            targetLayer = LayerMask.NameToLayer("Enemy");
+            gameObject.layer = LayerMask.NameToLayer("Friendly");
+        }
+
         for(int i = 0; i < unitBehaviours.Length; i++)
         {
             if (unitBehaviours[i].unitBehaviourType == type)
@@ -81,7 +97,7 @@ public class Unit : MonoBehaviour
     {
         unitBehaviours = GetComponentsInChildren<UnitBehaviour>();
         curUnitBehaviour = GetUnitBehaviour(UnitBehaviourType.Wild);
-
+        attackTimer = maxAttackTimer;
         catchBarImage.fillAmount = 0;
         hpBarBg.gameObject.SetActive(false);
         hp = maxHp;
@@ -102,8 +118,7 @@ public class Unit : MonoBehaviour
     }
 
 
-    public float attackTimer;
-    public bool endAttack;
+    
     //Attack 애니메이션이 끝나면 호출되는 함수!
     public void EndAttack()
     {
@@ -111,7 +126,6 @@ public class Unit : MonoBehaviour
         attackTimer = 0;
     }
 
-    public LayerMask targetLayer;
    
 
     void Die()
