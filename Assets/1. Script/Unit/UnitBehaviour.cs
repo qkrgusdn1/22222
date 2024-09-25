@@ -58,30 +58,7 @@ public abstract class UnitBehaviour : MonoBehaviour
         if (unit.rangePoint != null && unit.target != null)
         {
             distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
-            if (distanceToPlayer <= unit.targetingRange)
-            {
-                if (distanceToPlayer > unit.attackRange)
-                {
-                    if (unit.endAttack)
-                    {
-                        unit.attackTimer = 0;
-                        unit.EnterState(UnitState.Approach);
-                        unit.agent.isStopped = false;
-                    }
-
-                    
-                }
-                else if(distanceToPlayer <= unit.attackRange)
-                {
-                    unit.animator.SetBool("IsRunning", false);
-                    unit.endAttack = false;
-                    unit.agent.isStopped = true;
-                    unit.agent.velocity = new Vector3(0, unit.rb.velocity.y, 0);
-                    unit.rb.velocity = new Vector3(0, unit.rb.velocity.y, 0);
-                    return;
-                }
-            }
-            else
+            if(distanceToPlayer >= unit.targetingRange)
             {
                 unit.EnterState(UnitState.Idle);
                 unit.agent.isStopped = true;
@@ -119,7 +96,7 @@ public abstract class UnitBehaviour : MonoBehaviour
             unit.EnterState(UnitState.Idle);
             return;
         }
-        else if (distanceToPlayer <= unit.attackRange)
+        else if (distanceToPlayer < unit.attackRange)
         {
             Debug.Log("AttackTime");
             unit.endAttack = false;
@@ -140,18 +117,28 @@ public abstract class UnitBehaviour : MonoBehaviour
 
     public virtual void UpdateAttackState()
     {
-        if (!unit.endAttack)
+        if (distanceToPlayer > unit.attackRange)
         {
-            unit.attackTimer -= Time.deltaTime;
-            unit.agent.isStopped = true;
-            unit.agent.velocity = new Vector3(0, unit.rb.velocity.y, 0);
-            unit.rb.velocity = new Vector3(0, unit.rb.velocity.y, 0);
-            if (unit.attackTimer <= 0)
+            if (unit.endAttack)
             {
-                unit.EnterState(UnitState.Idle);
-                return;
+                unit.attackTimer = 0;
+                unit.EnterState(UnitState.Approach);
+                unit.agent.isStopped = false;
             }
+            return;
         }
+        unit.attackTimer -= Time.deltaTime;
+        unit.agent.isStopped = true;
+        unit.agent.velocity = new Vector3(0, unit.rb.velocity.y, 0);
+        unit.rb.velocity = new Vector3(0, unit.rb.velocity.y, 0);
+        if (unit.attackTimer <= 0)
+        {
+            unit.EnterState(UnitState.Idle);
+            return;
+        }
+
+
+
     }
 
     public virtual void UpdateKnockDownState()

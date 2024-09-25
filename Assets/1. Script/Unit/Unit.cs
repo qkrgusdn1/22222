@@ -50,7 +50,6 @@ public class Unit : MonoBehaviour, Fighter
     public GameObject regularStateBg;
 
     public LayerMask targetLayer;
-    public LayerMask friendlyLayer;
 
     public TMP_Text regularStateText;
     private void OnDrawGizmosSelected()
@@ -65,7 +64,6 @@ public class Unit : MonoBehaviour, Fighter
 
     private void Awake()
     {
-        
         for (int i = 0; i < unitBehaviours.Length; i++)
         {
             unitBehaviours[i].InitUnit(this);
