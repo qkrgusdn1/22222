@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.AI;
 using UnityEditor;
 using static UnityEngine.UI.CanvasScaler;
+using TMPro;
 
 public class Unit : MonoBehaviour, Fighter
 {
@@ -46,9 +47,12 @@ public class Unit : MonoBehaviour, Fighter
 
     public int attackAmount;
 
-    public GameObject stateBg;
+    public GameObject regularStateBg;
 
     public LayerMask targetLayer;
+    public LayerMask friendlyLayer;
+
+    public TMP_Text regularStateText;
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

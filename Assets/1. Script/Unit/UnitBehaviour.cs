@@ -93,6 +93,7 @@ public abstract class UnitBehaviour : MonoBehaviour
 
     public virtual void UpdateIdleState() //Idle 행동 - 어떤 활동 필요?
     {
+        unit.animator.SetBool("IsRunning", false);
         Debug.Log("UpdateIdleState");
         Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
 
@@ -110,12 +111,6 @@ public abstract class UnitBehaviour : MonoBehaviour
 
         //타겟이 null일때 , 멀때 -> Idle
         //타겟이 공격 범위 안으로 들어왔을 때 -> Attack
-
-        if (unit.target == null)
-        {
-            unit.EnterState(UnitState.Idle);
-            return;
-        }
         distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
         //타겟이 멀면 Idle로 전환
         if (distanceToPlayer > unit.targetingRange)

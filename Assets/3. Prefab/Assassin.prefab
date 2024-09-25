@@ -109,9 +109,9 @@ RectTransform:
   - {fileID: 2690878415294934064}
   m_Father: {fileID: 7614193929196574529}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 812.86633, y: -50}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 442.5438, y: 221.2719}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8206030690041479867
@@ -195,7 +195,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 3746443320359532561}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 898532007371936841}
+        m_TargetAssemblyTypeName: RegularUnitBehaviour, Assembly-CSharp
+        m_MethodName: OnClickedChangeRegularUnitStateBtn
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Defender
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &461073736564684871
 GameObject:
   m_ObjectHideFlags: 0
@@ -365,9 +377,9 @@ RectTransform:
   - {fileID: 1178099092774515420}
   m_Father: {fileID: 7614193929196574529}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 1354.7772, y: -50}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 442.5438, y: 221.2719}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8800155278609468213
@@ -451,7 +463,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 4069337041363077173}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 898532007371936841}
+        m_TargetAssemblyTypeName: RegularUnitBehaviour, Assembly-CSharp
+        m_MethodName: OnClickedChangeRegularUnitStateBtn
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Follow
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &756588757114420978
 GameObject:
   m_ObjectHideFlags: 0
@@ -1275,9 +1299,9 @@ RectTransform:
   - {fileID: 7898977606905033956}
   m_Father: {fileID: 7614193929196574529}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 270.95544, y: -50}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 442.5438, y: 221.2719}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3565484384895904810
@@ -1361,7 +1385,31 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 6204442870727388525}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 898532007371936841}
+        m_TargetAssemblyTypeName: RegularUnitBehaviour, Assembly-CSharp
+        m_MethodName: OnClickedChangeRegularUnitStateBtn
+        m_Mode: 5
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: Guard
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 0}
+        m_TargetAssemblyTypeName: RegularUnitBehaviour, Assembly-CSharp
+        m_MethodName: 
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!1 &2252444329656101730
 GameObject:
   m_ObjectHideFlags: 0
@@ -2898,10 +2946,14 @@ MonoBehaviour:
   maxAttackTimer: 3
   endAttack: 0
   attackAmount: 0
-  stateBg: {fileID: 4156062960041025721}
+  regularStateBg: {fileID: 4156062960041025721}
   targetLayer:
     serializedVersion: 2
     m_Bits: 512
+  friendlyLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  regularStateText: {fileID: 4700578594793770995}
 --- !u!136 &684338821514662603
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -2989,6 +3041,8 @@ MonoBehaviour:
   unit: {fileID: 5921548955846739441}
   unitBehaviourType: 1
   distanceToPlayer: 0
+  regularUnitState: 0
+  stopRange: 1.3
 --- !u!114 &4331817136981305367
 MonoBehaviour:
   m_ObjectHideFlags: 0

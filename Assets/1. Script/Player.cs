@@ -80,7 +80,7 @@ public class Player : MonoBehaviour, Fighter
     float catchTimer;
     public float maxCatchTimer;
 
-    bool activeStateBg;
+    public bool activeStateBg;
     private void Awake()
     {
         animationEventHandler = bodyTr.GetComponent<AnimationEventHandler>();
@@ -249,7 +249,7 @@ public class Player : MonoBehaviour, Fighter
                     {
                         if (activeStateBg)
                         {
-                            unit.stateBg.SetActive(false);
+                            unit.regularStateBg.SetActive(false);
                             activeStateBg = false;
                             IsStop = false;
                             Cursor.lockState = CursorLockMode.Locked;
@@ -257,7 +257,7 @@ public class Player : MonoBehaviour, Fighter
                         }
                         else
                         {
-                            unit.stateBg.SetActive(true);
+                            unit.regularStateBg.SetActive(true);
                             activeStateBg = true;
                             IsStop = true;
                             Cursor.lockState = CursorLockMode.None;
@@ -270,7 +270,7 @@ public class Player : MonoBehaviour, Fighter
                                 weaponInventory.buttons[i].gameObject.SetActive(false);
                             }
                         }
-                        break; 
+                        break;
                     }
                 }
 
@@ -357,10 +357,10 @@ public class Player : MonoBehaviour, Fighter
         }
     }
 
-
     void Catch(Unit unit)
     {
         unit.curUnitBehaviour = unit.GetUnitBehaviour(UnitBehaviourType.Reguler);
+        unit.curUnitBehaviour.GetComponent<RegularUnitBehaviour>().PlayerSetting(this);
         unit.hpBar.color = Color.green;
         unit.hp = catchTarget.maxHp;
         unit.catchBarBgImage.SetActive(false);
