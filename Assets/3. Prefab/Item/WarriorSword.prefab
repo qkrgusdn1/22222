@@ -109,7 +109,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7412653349871334482}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 57.519, y: 0.9, z: 154.568}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -134,7 +134,8 @@ MonoBehaviour:
   itemType: 0
   upDownSpeed: 0.3
   upDownDistance: 0.3
-  description: sssssword
+  description: "\uAE30\uBCF8\uC73C\uB85C \uC8FC\uC5B4\uC9C0\uB294 \uC804\uC0AC\uC758
+    \uAC80"
   rotationSpeed: 30
   body: {fileID: 243219608592339679}
 --- !u!136 &3297600391022405621

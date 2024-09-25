@@ -7,14 +7,12 @@ using UnityEngine.AI;
 using UnityEditor;
 using static UnityEngine.UI.CanvasScaler;
 
-public class Unit : MonoBehaviour
+public class Unit : MonoBehaviour, Fighter
 {
     public UnitBehaviour[] unitBehaviours;
     public UnitBehaviour curUnitBehaviour;
 
     public UnitType unitType;
-
-    public bool friendly;
 
     public NavMeshAgent agent;
     public GameObject target;
@@ -27,6 +25,8 @@ public class Unit : MonoBehaviour
     public float targetingRange;
     public float attackRange;
     public float knockDownRange;
+
+    public Weapon weapon;
 
     public float hp;
     public float maxHp;
@@ -46,8 +46,9 @@ public class Unit : MonoBehaviour
 
     public int attackAmount;
 
-    public LayerMask targetLayer;
+    public GameObject stateBg;
 
+    public LayerMask targetLayer;
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
@@ -60,13 +61,16 @@ public class Unit : MonoBehaviour
 
     private void Awake()
     {
-        for(int i = 0; i < unitBehaviours.Length; i++)
+        
+        for (int i = 0; i < unitBehaviours.Length; i++)
         {
             unitBehaviours[i].InitUnit(this);
         }
         animationEventHandler.finishAttackListener += FinishAttack;
+        animationEventHandler.startAttackListener += StartAttack;
+        animationEventHandler.endAttackListener += EndAttack;
         animationEventHandler.dieListener += Die;
-        rb = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>(); 
         agent = GetComponent<NavMeshAgent>();
         agent.speed = moveSpeed;
     }
@@ -77,11 +81,13 @@ public class Unit : MonoBehaviour
         {
             targetLayer = LayerMask.GetMask("Friendly");
             gameObject.layer = LayerMask.NameToLayer("Enemy");
+            weapon.hitLayerMask = targetLayer;
         }
         else if(type == UnitBehaviourType.Reguler)
         {
             targetLayer = LayerMask.GetMask("Enemy");
             gameObject.layer = LayerMask.NameToLayer("Friendly");
+            weapon.hitLayerMask = targetLayer;
         }
 
         for(int i = 0; i < unitBehaviours.Length; i++)
@@ -120,24 +126,35 @@ public class Unit : MonoBehaviour
         }
         if(state == UnitState.Attack)
         {
-            Attack();
+            AttackStart();
         }
     }
-
-    public void Attack()
+    public void Attack(Fighter target, float damage)
+    {
+        if (target != null)
+            target.TakeDamage(damage);
+    }
+    public void AttackStart()
     {
         animator.SetBool("IsRunning", false);
         attackTimer = maxAttackTimer;
         animator.Play("Attack" + attackAmount);
     }
-    
-    //Attack 애니메이션이 끝나면 호출되는 함수!
+
+    public void StartAttack()
+    {
+        weapon.StartAttack();
+    }
+
+    public void EndAttack()
+    {
+        weapon.EndAttack();
+    }
+
     public void FinishAttack()
     {
         endAttack = true;
     }
-
-   
 
     void Die()
     {

@@ -7,6 +7,7 @@ public abstract class UnitBehaviour : MonoBehaviour
     public Unit unit;
     public UnitBehaviourType unitBehaviourType;
     public float distanceToPlayer;
+
     public virtual void InitUnit(Unit unit)
     {
         this.unit = unit;
@@ -57,7 +58,6 @@ public abstract class UnitBehaviour : MonoBehaviour
         if (unit.rangePoint != null && unit.target != null)
         {
             distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
-
             if (distanceToPlayer <= unit.targetingRange)
             {
                 if (distanceToPlayer > unit.attackRange)
@@ -98,10 +98,9 @@ public abstract class UnitBehaviour : MonoBehaviour
 
         if (cols.Length <= 0)
             return;
-
         unit.target = cols[0].gameObject;
-
         unit.EnterState(UnitState.Approach);
+        
     }
 
     public virtual void UpdateApproachState()
@@ -117,9 +116,8 @@ public abstract class UnitBehaviour : MonoBehaviour
             unit.EnterState(UnitState.Idle);
             return;
         }
-        
-        //타겟이 멀면 Idle로 전환
         distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
+        //타겟이 멀면 Idle로 전환
         if (distanceToPlayer > unit.targetingRange)
         {
             unit.target = null;

@@ -9,9 +9,14 @@ public class Weapon : MonoBehaviour
     public bool canDamage;
     public GameObject rangePoint;
     public List<GameObject> hittedList = new List<GameObject>();
-    Player owner;
+    Fighter owner;
     public float damage;
     public LayerMask hitLayerMask;
+
+    private void Start()
+    {
+        owner = GetComponentInParent<Fighter>();
+    }
     public void StartAttack()
     {
         canDamage = true;
@@ -20,10 +25,7 @@ public class Weapon : MonoBehaviour
     public void EndAttack()
     {
         canDamage = false;
-    }
-    private void Start()
-    {
-        owner = GetComponentInParent<Player>();
+        hittedList.Clear();
     }
 
     public void Update()
@@ -36,7 +38,7 @@ public class Weapon : MonoBehaviour
             if (!hittedList.Contains(colliders[i].gameObject))
             {
                 hittedList.Add(colliders[i].gameObject);
-                owner.Attack(colliders[i].gameObject.GetComponent<Unit>(), damage);
+                owner.Attack(colliders[i].gameObject.GetComponent<Fighter>(), damage);
             }
         }
 

@@ -1,8 +1,10 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, Fighter
 {
     public float moveSpeed;
     public Transform bodyTr;
@@ -28,6 +30,12 @@ public class Player : MonoBehaviour
     public Collider mainCollider;
     public Collider rollCollider;
 
+    public float hp;
+    public float maxHp;
+    public Image hpBar;
+    public Image hpBarSecondImage;
+
+
 
 
     [Tooltip("작을 수록 빠르게 회전함")]
@@ -42,7 +50,8 @@ public class Player : MonoBehaviour
     public bool isGrounded;
     public LayerMask groundLayer;
     public LayerMask itemLayer;
-    public LayerMask unitLayer;
+    public LayerMask enemyLayer;
+    public LayerMask friendlyLayer;
     Rigidbody rb;
     public float checkPickUpRange;
 
@@ -71,7 +80,7 @@ public class Player : MonoBehaviour
     float catchTimer;
     public float maxCatchTimer;
 
-
+    bool activeStateBg;
     private void Awake()
     {
         animationEventHandler = bodyTr.GetComponent<AnimationEventHandler>();
@@ -86,13 +95,16 @@ public class Player : MonoBehaviour
     }
     private void Start()
     {
+        hp = maxHp;
+        hpBar.fillAmount = 1;
+        hpBarSecondImage.fillAmount = 1;
         jumpForce = maxJumpForce;
         rb = GetComponent<Rigidbody>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    public void Attack(Unit target, float damage)
+    public void Attack(Fighter target, float damage)
     {
         if (target != null)
             target.TakeDamage(damage);
@@ -102,6 +114,31 @@ public class Player : MonoBehaviour
         inventory.currentWeapon.StartAttack();
     }
 
+    public void TakeDamage(float damage)
+    {
+        hp -= damage;
+
+        hpBar.fillAmount = hp / maxHp;
+        StartCoroutine(CoSmoothHpBar(hpBar.fillAmount, 1));
+        if (hp <= 0)
+        {
+            animator.Play("Die");
+        }
+    }
+    private IEnumerator CoSmoothHpBar(float targetFillAmount, float duration)
+    {
+        float elapsedTime = 0f;
+        float startFillAmount = hpBarSecondImage.fillAmount;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            hpBarSecondImage.fillAmount = Mathf.Lerp(startFillAmount, targetFillAmount, elapsedTime / duration);
+            yield return null;
+        }
+
+        hpBarSecondImage.fillAmount = targetFillAmount;
+    }
     public void EndAttack()
     {
         inventory.currentWeapon.EndAttack();
@@ -151,9 +188,11 @@ public class Player : MonoBehaviour
         }
         else
         {
+            animator.SetBool("IsRunning", false);
             rb.velocity = new Vector3(0, rb.velocity.y, 0);
         }
-        if (Input.GetMouseButtonDown(0) && !isRoll)
+
+        if (Input.GetMouseButtonDown(0) && !isRoll && !IsStop)
         {
             if (inventory.currentWeapon != null && !noFinshAttack)
             {
@@ -177,7 +216,7 @@ public class Player : MonoBehaviour
                 }
             }
 
-            cols = Physics.OverlapSphere(transform.position, checkPickUpRange, unitLayer);
+            cols = Physics.OverlapSphere(transform.position, checkPickUpRange, enemyLayer);
             Debug.Log(cols.Length);
             if (cols.Length >= 1)
             {
@@ -192,9 +231,54 @@ public class Player : MonoBehaviour
                     }
                 }
             }
+
+            cols = Physics.OverlapSphere(transform.position, checkPickUpRange, friendlyLayer);
+            Debug.Log(cols.Length);
+            if (cols.Length >= 1)
+            {
+                foreach (Collider col in cols)
+                {
+                    if (col.GetComponent<Player>() != null)
+                    {
+                        continue;
+                    }
+
+                    Unit unit = col.GetComponent<Unit>();
+                    Inventory weaponInventory = Inventory.Instance;
+                    if (unit != null)
+                    {
+                        if (activeStateBg)
+                        {
+                            unit.stateBg.SetActive(false);
+                            activeStateBg = false;
+                            IsStop = false;
+                            Cursor.lockState = CursorLockMode.Locked;
+                            Cursor.visible = false;
+                        }
+                        else
+                        {
+                            unit.stateBg.SetActive(true);
+                            activeStateBg = true;
+                            IsStop = true;
+                            Cursor.lockState = CursorLockMode.None;
+                            Cursor.visible = true;
+                            inventoryBg.SetActive(false);
+                            weaponInventory.selectImage.gameObject.SetActive(false);
+                            weaponInventory.selectDescription.gameObject.SetActive(false);
+                            for (int i = 0; i < weaponInventory.buttons.Count; i++)
+                            {
+                                weaponInventory.buttons[i].gameObject.SetActive(false);
+                            }
+                        }
+                        break; 
+                    }
+                }
+
+            }
         }
         if (Input.GetKey(KeyCode.F))
         {
+            
             if (catchTarget != null)
             {
                 Dictionary<UnitType, float> unitTimers = new Dictionary<UnitType, float>
@@ -228,7 +312,7 @@ public class Player : MonoBehaviour
             catchTimer = 0;
         }
 
-        if (Input.GetKeyDown(KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E) && !activeStateBg)
         {
             Inventory weaponInventory = Inventory.Instance;
             if (!inventoryBg.activeSelf)
