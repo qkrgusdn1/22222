@@ -2930,7 +2930,7 @@ MonoBehaviour:
   animator: {fileID: 2025833536367755740}
   moveSpeed: 4
   targetingRange: 10
-  attackRange: 1.7
+  attackRange: 1.5
   knockDownRange: 2
   weapon: {fileID: 4803975792115509913}
   hp: 0
@@ -2949,10 +2949,7 @@ MonoBehaviour:
   regularStateBg: {fileID: 4156062960041025721}
   targetLayer:
     serializedVersion: 2
-    m_Bits: 512
-  friendlyLayer:
-    serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   regularStateText: {fileID: 4700578594793770995}
 --- !u!136 &684338821514662603
 CapsuleCollider:
@@ -3042,7 +3039,7 @@ MonoBehaviour:
   unitBehaviourType: 1
   distanceToPlayer: 0
   regularUnitState: 0
-  stopRange: 1.3
+  stopRange: 3
 --- !u!114 &4331817136981305367
 MonoBehaviour:
   m_ObjectHideFlags: 0

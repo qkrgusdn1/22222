@@ -10,10 +10,13 @@ public class RegularUnitBehaviour : UnitBehaviour
 
     public float stopRange;
 
+    string regularStateName;
+
     private void Start()
     {
         regularUnitState = RegularUnitState.Defender;
-        unit.regularStateText.text = "현재 아군 상태 : " + RegularUnitState.Defender.ToString();
+        regularStateName = "사수";
+        unit.regularStateText.text = "현재 아군 상태 : " + regularStateName;
     }
 
     private void OnDrawGizmosSelected()
@@ -42,6 +45,8 @@ public class RegularUnitBehaviour : UnitBehaviour
                 unit.EnterState(UnitState.Approach);
             }
         }
+
+        
        
     }
 
@@ -52,16 +57,23 @@ public class RegularUnitBehaviour : UnitBehaviour
             regularUnitState = state;
         }
 
-        if(regularUnitState == RegularUnitState.Follow || regularUnitState == RegularUnitState.Guard)
+        if(regularUnitState == RegularUnitState.Follow)
         {
             unit.EnterState(UnitState.Approach);
+            regularStateName = "따라오기";
+        }
+        else if(regularUnitState == RegularUnitState.Guard)
+        {
+            unit.EnterState(UnitState.Approach);
+            regularStateName = "경호";
         }
         else if(regularUnitState == RegularUnitState.Defender)
         {
             unit.EnterState(UnitState.Idle);
+            regularStateName = "사수";
         }
 
-        unit.regularStateText.text = "현재 아군 상태 : " + regularStateBtnName;
+        unit.regularStateText.text = "현재 아군 상태 : " + regularStateName;
     }
 
     public override void UpdateApproachState()

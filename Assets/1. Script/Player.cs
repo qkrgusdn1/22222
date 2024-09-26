@@ -70,7 +70,7 @@ public class Player : MonoBehaviour, Fighter
     private Vector3 rollDirection;
 
     public int attackAmount;
-    const int MAXATTACKAMOUNT = 2;
+    const int MAXATTACKAMOUNT = 3;
     float stopAttackTime;
     public float maxStopAttackTime;
 
@@ -199,7 +199,7 @@ public class Player : MonoBehaviour, Fighter
                 noFinshAttack = true;
                 IsStop = true;
                 Debug.Log("Attack" + attackAmount);
-                animator.Play("Attack" + attackAmount);
+                animator.SetTrigger("Attack" + attackAmount);
             }
         }
 
@@ -234,7 +234,7 @@ public class Player : MonoBehaviour, Fighter
 
             cols = Physics.OverlapSphere(transform.position, checkPickUpRange, friendlyLayer);
             Debug.Log(cols.Length);
-            if (cols.Length >= 1)
+            if (cols.Length >= 1 && catchTarget == null)
             {
                 foreach (Collider col in cols)
                 {
