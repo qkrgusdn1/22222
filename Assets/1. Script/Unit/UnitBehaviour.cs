@@ -7,7 +7,12 @@ public abstract class UnitBehaviour : MonoBehaviour
     public Unit unit;
     public UnitBehaviourType unitBehaviourType;
     public float distanceToPlayer;
+    public Player player;
 
+    public void PlayerSetting(Player player)
+    {
+        this.player = player;
+    }
     public virtual void InitUnit(Unit unit)
     {
         this.unit = unit;
@@ -34,6 +39,12 @@ public abstract class UnitBehaviour : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (unit.unitBehaviourType == UnitBehaviourType.Reguler)
+            UpdateFKeyImage();
+    }
+
     public virtual void UpdateState(UnitState state)
     {
         Debug.Log($"UpdateState: {state}");
@@ -51,7 +62,8 @@ public abstract class UnitBehaviour : MonoBehaviour
         }
         else if (unit.unitState == UnitState.KnockDown)
         {
-            UpdateKnockDownState();
+            if(unit.unitBehaviourType == UnitBehaviourType.Wild)
+                UpdateKnockDownState();
             return;
         }
 
@@ -137,8 +149,6 @@ public abstract class UnitBehaviour : MonoBehaviour
             return;
         }
 
-
-
     }
 
     public virtual void UpdateKnockDownState()
@@ -163,6 +173,30 @@ public abstract class UnitBehaviour : MonoBehaviour
         {
             unit.catchBarImage.fillAmount = 0;
             unit.catchBarBgImage.SetActive(false);
+        }
+    }
+
+    public virtual void UpdateFKeyImage()
+    {
+        Collider[] colliders = Physics.OverlapSphere(unit.rangePoint.transform.position, unit.knockDownRange, unit.friendlyLayer);
+
+        bool isPlayerInRange = false;
+
+        foreach (Collider collider in colliders)
+        {
+            if (collider.gameObject.CompareTag("Player"))
+            {
+                isPlayerInRange = true;
+                break;
+            }
+        }
+        if (isPlayerInRange)
+        {
+            unit.fKeyImage.gameObject.SetActive(true);
+        }
+        else
+        {
+            unit.fKeyImage.gameObject.SetActive(false);
         }
     }
 }

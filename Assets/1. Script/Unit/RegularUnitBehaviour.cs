@@ -2,15 +2,17 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class RegularUnitBehaviour : UnitBehaviour
 {
-    Player player;
+
     public RegularUnitState regularUnitState;
 
     public float stopRange;
 
     string regularStateName;
+
 
     private void Start()
     {
@@ -25,10 +27,7 @@ public class RegularUnitBehaviour : UnitBehaviour
         Gizmos.DrawWireSphere(unit.rangePoint.transform.position, stopRange);
     }
 
-    public void PlayerSetting(Player player)
-    {
-        this.player = player;
-    }
+
 
     private void Update()
     {
@@ -45,9 +44,6 @@ public class RegularUnitBehaviour : UnitBehaviour
                 unit.EnterState(UnitState.Approach);
             }
         }
-
-        
-       
     }
 
     public void OnClickedChangeRegularUnitStateBtn(string regularStateBtnName)
@@ -78,9 +74,8 @@ public class RegularUnitBehaviour : UnitBehaviour
 
     public override void UpdateApproachState()
     {
-        bool isFollowOrGuard = (regularUnitState == RegularUnitState.Follow) || (regularUnitState == RegularUnitState.Guard && unit.target == null);
 
-        if (isFollowOrGuard)
+        if (regularUnitState == RegularUnitState.Follow || regularUnitState == RegularUnitState.Guard && unit.target == null)
         {
             unit.animator.SetBool("IsRunning", true);
             unit.agent.SetDestination(player.transform.position);
@@ -99,6 +94,8 @@ public class RegularUnitBehaviour : UnitBehaviour
 
         base.UpdateApproachState();
     }
+
+    
 }
 
 public enum RegularUnitState

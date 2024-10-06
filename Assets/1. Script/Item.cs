@@ -38,20 +38,18 @@ public class Item : MonoBehaviour
         if (itemType == ItemType.weapon)
         {
 
-            for (int i = 0; i < Inventory.Instance.itemFrames.Count; i++)
+            for (int i = 0; i < GameMgr.Instance.inventory.itemFrames.Count; i++)
             {
-                if (string.IsNullOrEmpty(Inventory.Instance.itemFrames[i].key))
+                if (string.IsNullOrEmpty(GameMgr.Instance.inventory.itemFrames[i].key) && GameMgr.Instance.inventory.items.ContainsKey(key) == false)
                 {
-                    if (Inventory.Instance.items.ContainsKey(key) == false)
-                    {
-                        Inventory.Instance.items.Add(key, new InventoryItem(key, sprite, description));
-                    }
-                    Inventory.Instance.itemFrames[i].inventoryItem.name = key;
-                    Inventory.Instance.AddItem(key, sprite, description);
+                    GameMgr.Instance.inventory.items.Add(key, new InventoryItem(key, sprite, description));
+                    GameMgr.Instance.inventory.itemFrames[i].SetInventoryItem(new InventoryItem(key, sprite, description));
+                    GameMgr.Instance.inventory.AddItem(key, sprite, description);
                     break;
                 }
             }
-        }else if(itemType == ItemType.armor)
+        }
+        else if(itemType == ItemType.heal)
         {
 
         }
@@ -63,5 +61,5 @@ public class Item : MonoBehaviour
 public enum ItemType
 {
     weapon,
-    armor
+    heal
 }

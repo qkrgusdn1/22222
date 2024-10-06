@@ -45,6 +45,8 @@ public class Unit : MonoBehaviour, Fighter
     public float maxAttackTimer;
     public bool endAttack;
 
+    public string unitName;
+
     public int attackAmount;
 
     public GameObject regularStateBg;
@@ -52,6 +54,17 @@ public class Unit : MonoBehaviour, Fighter
     public LayerMask targetLayer;
 
     public TMP_Text regularStateText;
+
+    public Sprite thumSprite;
+
+    public Sprite image;
+
+    public UnitBehaviourType unitBehaviourType;
+
+    public GameObject fKeyImage;
+    public LayerMask friendlyLayer;
+
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
@@ -79,11 +92,13 @@ public class Unit : MonoBehaviour, Fighter
 
     public UnitBehaviour GetUnitBehaviour(UnitBehaviourType type)
     {
-        if(type == UnitBehaviourType.Wild)
+        unitBehaviourType = type;
+        if (type == UnitBehaviourType.Wild)
         {
             targetLayer = LayerMask.GetMask("Friendly");
             gameObject.layer = LayerMask.NameToLayer("Enemy");
             weapon.hitLayerMask = targetLayer;
+            
         }
         else if(type == UnitBehaviourType.Reguler)
         {
@@ -181,6 +196,8 @@ public class Unit : MonoBehaviour, Fighter
 
         hpBarSecondImage.fillAmount = targetFillAmount;
     }
+
+
 
     public void TakeDamage(float damage)
     {

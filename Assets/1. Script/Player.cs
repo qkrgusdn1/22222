@@ -35,7 +35,7 @@ public class Player : MonoBehaviour, Fighter
     public Image hpBar;
     public Image hpBarSecondImage;
 
-
+    public FriendlyBtn friendlyBtnPrefab;
 
 
     [Tooltip("작을 수록 빠르게 회전함")]
@@ -81,6 +81,8 @@ public class Player : MonoBehaviour, Fighter
     public float maxCatchTimer;
 
     public bool activeStateBg;
+
+
     private void Awake()
     {
         animationEventHandler = bodyTr.GetComponent<AnimationEventHandler>();
@@ -92,6 +94,7 @@ public class Player : MonoBehaviour, Fighter
         animationEventHandler.endRollListener += EndRoll;
         mainCollider.enabled = true;
         rollCollider.enabled = false;
+        GameMgr.Instance.inventory = inventory;
     }
     private void Start()
     {
@@ -244,7 +247,7 @@ public class Player : MonoBehaviour, Fighter
                     }
 
                     Unit unit = col.GetComponent<Unit>();
-                    Inventory weaponInventory = Inventory.Instance;
+                    Inventory weaponInventory = GameMgr.Instance.inventory;
                     if (unit != null)
                     {
                         if (activeStateBg)
@@ -278,7 +281,6 @@ public class Player : MonoBehaviour, Fighter
         }
         if (Input.GetKey(KeyCode.F))
         {
-            
             if (catchTarget != null)
             {
                 Dictionary<UnitType, float> unitTimers = new Dictionary<UnitType, float>
@@ -314,7 +316,7 @@ public class Player : MonoBehaviour, Fighter
 
         if (Input.GetKeyDown(KeyCode.E) && !activeStateBg)
         {
-            Inventory weaponInventory = Inventory.Instance;
+            Inventory weaponInventory = GetComponentInChildren<Inventory>();
             if (!inventoryBg.activeSelf)
             {
                 inventoryBg.SetActive(true);
@@ -326,6 +328,8 @@ public class Player : MonoBehaviour, Fighter
             else if (inventoryBg.activeSelf)
             {
                 inventoryBg.SetActive(false);
+                inventory.friendlyImageBasic.gameObject.SetActive(true);
+                inventory.friendlyImage.gameObject.SetActive(false);
                 IsStop = false;
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
@@ -335,6 +339,7 @@ public class Player : MonoBehaviour, Fighter
                 {
                     weaponInventory.buttons[i].gameObject.SetActive(false);
                 }
+
             }
         }
 
@@ -360,7 +365,7 @@ public class Player : MonoBehaviour, Fighter
     void Catch(Unit unit)
     {
         unit.curUnitBehaviour = unit.GetUnitBehaviour(UnitBehaviourType.Reguler);
-        unit.curUnitBehaviour.GetComponent<RegularUnitBehaviour>().PlayerSetting(this);
+        unit.curUnitBehaviour.GetComponent<UnitBehaviour>().PlayerSetting(this);
         unit.hpBar.color = Color.green;
         unit.hp = catchTarget.maxHp;
         unit.catchBarBgImage.SetActive(false);
@@ -368,6 +373,10 @@ public class Player : MonoBehaviour, Fighter
         unit.EnterState(UnitState.Idle);
         unit.animator.SetBool("IsKnockDown", false);
         unit.agent.isStopped = false;
+
+        FriendlyBtn friendlyBtn = Instantiate(friendlyBtnPrefab, inventory.friendlyBtnGroup.transform);
+        friendlyBtn.SetFriendlyBtn(inventory, unit);
+
         catchTarget = null;
     }
 

@@ -10,15 +10,20 @@ public class ItemFrame : MonoBehaviour
     public Image weaponImage;
     public string weaponDescription;
 
-
-
     [HideInInspector]
     public InventoryItem inventoryItem;
-    
+
+    Inventory inventory;
+
+    private void Start()
+    {
+        inventory = GetComponentInParent<Inventory>();
+    }
+
 
     public void OnClickedSelectWeaponBtn()
     {
-        Inventory weaponInventory = Inventory.Instance;
+        Inventory weaponInventory = GameMgr.Instance.inventory;
         Debug.Log("OnClickedSelectWeaponBtn");
         if (!weaponInventory.selectImage.gameObject.activeSelf)
         {
@@ -32,6 +37,7 @@ public class ItemFrame : MonoBehaviour
         weaponInventory.selectImage.sprite = weaponImage.sprite;
         weaponInventory.selectDescription.text = weaponDescription;
         weaponInventory.weaponKey = key;
+        inventory.WeaponImageChange(weaponInventory.selectImage.sprite);
     }
 
     public void SetInventoryItem(InventoryItem item)
@@ -42,11 +48,13 @@ public class ItemFrame : MonoBehaviour
             key = null;
             return;
         }
-
-        Debug.Log("SetInventoryItem");
-        inventoryItem = item;
-        weaponImage.sprite = item.sprite;
-        weaponDescription = item.description;
-        key = inventoryItem.name;
+        else
+        {
+            inventoryItem = item;
+            weaponImage.sprite = item.sprite;
+            weaponDescription = item.description;
+            key = inventoryItem.name;
+        }
+        
     }
 }
