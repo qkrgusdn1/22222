@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -15,17 +13,25 @@ public class FriendlyBtn : MonoBehaviour
     public string atkText;
 
     Inventory inventory;
+    Player player;
+
 
     bool set;
     Unit unit;
+    bool mine;
 
+    private void Start()
+    {
+        player = GetComponentInParent<Player>();
+    }
 
     private void Update()
     {
         if (set)
         {
-            inventory.friendlyHpText.text = "Hp : " + unit.hp.ToString() + "/" + maxHpText;
-            if(unit == null)
+            if (mine)
+                inventory.friendlyHpText.text = "Hp : " + unit.hp.ToString() + "/" + maxHpText;
+            if (unit == null)
             {
                 Destroy(gameObject);
             }
@@ -54,12 +60,26 @@ public class FriendlyBtn : MonoBehaviour
 
         inventory.friendlyAtkText.text = "Atk : " + atkText;
 
-        for(int i = 0; i < inventory.changeStateBtns.Length; i++)
+        for (int i = 0; i < inventory.changeStateBtns.Length; i++)
         {
             inventory.changeStateBtns[i].unit = unit;
+            inventory.changeStateBtns[i].ChangeState(unit.GetComponent<RegularUnitBehaviour>());
             inventory.changeStateBtns[i].stateText = inventory.stateText;
         }
-        
+        mine = true;
+        for (int i = 0; i < player.friendlyBtns.Count; i++)
+        {
+            if (player.friendlyBtns[i] == this)
+            {
+                continue;
+            }
+            else
+            {
+                player.friendlyBtns[i].mine = false;
+            }
+        }
+
+
     }
 
 }

@@ -36,6 +36,7 @@ public class Player : MonoBehaviour, Fighter
     public Image hpBarSecondImage;
 
     public FriendlyBtn friendlyBtnPrefab;
+    public List<FriendlyBtn> friendlyBtns = new List<FriendlyBtn>();
 
 
     [Tooltip("작을 수록 빠르게 회전함")]
@@ -84,6 +85,7 @@ public class Player : MonoBehaviour, Fighter
 
     public List<Unit> friendlyUnits = new List<Unit>();
 
+    Unit currentUnit;
 
     private void Awake()
     {
@@ -107,6 +109,7 @@ public class Player : MonoBehaviour, Fighter
         rb = GetComponent<Rigidbody>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        
     }
 
     public void Attack(Fighter target, float damage)
@@ -207,7 +210,7 @@ public class Player : MonoBehaviour, Fighter
                 animator.SetTrigger("Attack" + attackAmount);
             }
         }
-
+        ChecknearRegularUnit();
         if (Input.GetKeyDown(KeyCode.F))
         {
             Collider[] cols = Physics.OverlapSphere(transform.position, checkPickUpRange, itemLayer);
@@ -220,56 +223,8 @@ public class Player : MonoBehaviour, Fighter
                     break;
                 }
             }
-
-            cols = Physics.OverlapSphere(transform.position, checkPickUpRange, enemyLayer);
             Debug.Log(cols.Length);
-            if (cols.Length >= 1)
-            {
-                foreach (Collider col in cols)
-                {
-                    Unit unit = col.GetComponent<Unit>();
-                    if (unit.unitState == UnitState.KnockDown)
-                    {
-                        catchTarget = unit;
-                        catchTimer = 0;
-                        break;
-                    }
-                }
-            }
-
-            cols = Physics.OverlapSphere(transform.position, checkPickUpRange, friendlyLayer);
-            Debug.Log(cols.Length);
-            if (cols.Length >= 1 && catchTarget == null)
-            {
-                foreach (Collider col in cols)
-                {
-                    if (col.GetComponent<Player>() != null)
-                    {
-                        continue;
-                    }
-
-                    Unit unit = col.GetComponent<Unit>();
-
-                    if (unit != null)
-                    {
-                        if (activeStateBg)
-                        {
-                            unit.regularStateBg.SetActive(false);
-                            activeStateBg = false;
-                            IsStop = false;
-                            Cursor.lockState = CursorLockMode.Locked;
-                            Cursor.visible = false;
-                        }
-                        else
-                        {
-                            unit.regularStateBg.SetActive(true);
-                            OnRegularUnitState();
-                        }
-                        break;
-                    }
-                }
-
-            }
+            
         }
         if (Input.GetKey(KeyCode.F))
         {
@@ -353,6 +308,83 @@ public class Player : MonoBehaviour, Fighter
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
     }
+
+    public void ChecknearRegularUnit()
+    {
+        Collider[] cols = Physics.OverlapSphere(transform.position, checkPickUpRange, enemyLayer | friendlyLayer);
+
+        float minDistance = float.MaxValue;
+        int targetIdx = -1;
+        for (int i = 0; i < cols.Length; i++)
+        {
+            Unit unit = cols[i].GetComponent<Unit>();
+
+            if (unit == null)
+                continue;
+            if (unit.unitBehaviourType == UnitBehaviourType.Wild)
+            {
+                if (unit.unitState != UnitState.KnockDown)
+                    continue;
+            }
+
+            float distance = Vector3.Distance(cols[i].transform.position, transform.position);
+
+            if (distance < minDistance)
+            {
+                minDistance = distance;
+                targetIdx = i;
+            }
+        }
+        if (targetIdx == -1)
+        {
+            if (currentUnit != null)
+            {
+                currentUnit.curUnitBehaviour.UpdateFKeyImage(false);
+                if (catchTarget != null)
+                {
+                    catchTarget.catchBarImage.fillAmount = 0;
+                }
+                catchTarget = null;
+                catchTimer = 0;
+            }
+            currentUnit = null;
+            return;
+        }
+            
+
+        
+        if (currentUnit != null)
+                currentUnit.curUnitBehaviour.UpdateFKeyImage(false);    
+        currentUnit = cols[targetIdx].GetComponent<Unit>();
+        currentUnit.curUnitBehaviour.UpdateFKeyImage(true);
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            if (currentUnit.unitState == UnitState.KnockDown && currentUnit.curUnitBehaviour.unitBehaviourType == UnitBehaviourType.Wild)
+            {
+                catchTarget = currentUnit;
+                catchTimer = 0;
+            }
+            else if (currentUnit.curUnitBehaviour.unitBehaviourType == UnitBehaviourType.Reguler)
+            {
+                if (activeStateBg)
+                {
+                    currentUnit.regularStateBg.SetActive(false);
+                    activeStateBg = false;
+                    IsStop = false;
+                    Cursor.lockState = CursorLockMode.Locked;
+                    Cursor.visible = false;
+                }
+                else
+                {
+                    currentUnit.regularStateBg.SetActive(true);
+                    OnRegularUnitState();
+                }
+            }
+        }
+
+
+    }
     
     public void OnRegularUnitState()
     {
@@ -384,6 +416,7 @@ public class Player : MonoBehaviour, Fighter
         unit.agent.isStopped = false;
 
         FriendlyBtn friendlyBtn = Instantiate(friendlyBtnPrefab, inventory.friendlyBtnGroup.transform);
+        friendlyBtns.Add(friendlyBtn);
         friendlyBtn.SetFriendlyBtn(inventory, unit);
 
         catchTarget = null;

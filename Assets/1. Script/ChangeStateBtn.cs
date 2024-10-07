@@ -9,14 +9,14 @@ public class ChangeStateBtn : MonoBehaviour
     public TMP_Text stateText;
     RegularUnitBehaviour regularUnitBehaviour;
 
-    private void Start()
-    {
-        regularUnitBehaviour = unit.GetComponent<RegularUnitBehaviour>();
-    }
-
     private void Update()
     {
         stateText.text = "현재 아군 상태 : " + regularUnitBehaviour.regularStateName;
+    }
+
+    public void ChangeState(RegularUnitBehaviour regularUnitBehaviour)
+    {
+        this.regularUnitBehaviour = regularUnitBehaviour;
     }
 
     public void OnClickedChangeState(string regularStateBtnName)

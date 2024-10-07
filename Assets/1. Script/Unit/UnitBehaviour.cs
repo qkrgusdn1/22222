@@ -39,12 +39,6 @@ public abstract class UnitBehaviour : MonoBehaviour
         }
     }
 
-    private void Update()
-    {
-        if (unit.unitBehaviourType == UnitBehaviourType.Reguler)
-            UpdateFKeyImage();
-    }
-
     public virtual void UpdateState(UnitState state)
     {
         Debug.Log($"UpdateState: {state}");
@@ -62,8 +56,6 @@ public abstract class UnitBehaviour : MonoBehaviour
         }
         else if (unit.unitState == UnitState.KnockDown)
         {
-            if(unit.unitBehaviourType == UnitBehaviourType.Wild)
-                UpdateKnockDownState();
             return;
         }
 
@@ -151,53 +143,23 @@ public abstract class UnitBehaviour : MonoBehaviour
 
     }
 
-    public virtual void UpdateKnockDownState()
+    public virtual void UpdateFKeyImage(bool active)
     {
-        Collider[] colliders = Physics.OverlapSphere(unit.rangePoint.transform.position, unit.knockDownRange, unit.targetLayer);
-
-        bool isPlayerInRange = false;
-
-        foreach (Collider collider in colliders)
+        if(unitBehaviourType == UnitBehaviourType.Reguler)
         {
-            if (collider.gameObject.CompareTag("Player"))
-            {
-                isPlayerInRange = true;
-                break;
-            }
+            unit.fKeyImage.gameObject.SetActive(active);
         }
-        if (isPlayerInRange)
-        {
-            unit.catchBarBgImage.SetActive(true);
-        }
-        else
+        else if(unitBehaviourType == UnitBehaviourType.Wild)
         {
             unit.catchBarImage.fillAmount = 0;
-            unit.catchBarBgImage.SetActive(false);
+            unit.catchBarBgImage.SetActive(active);
         }
-    }
 
-    public virtual void UpdateFKeyImage()
-    {
-        Collider[] colliders = Physics.OverlapSphere(unit.rangePoint.transform.position, unit.knockDownRange, unit.friendlyLayer);
+        if (unit.catchBarBgImage.activeSelf)
+        {
 
-        bool isPlayerInRange = false;
-
-        foreach (Collider collider in colliders)
-        {
-            if (collider.gameObject.CompareTag("Player"))
-            {
-                isPlayerInRange = true;
-                break;
-            }
         }
-        if (isPlayerInRange)
-        {
-            unit.fKeyImage.gameObject.SetActive(true);
-        }
-        else
-        {
-            unit.fKeyImage.gameObject.SetActive(false);
-        }
+            unit.catchBarImage.fillAmount = 0;
     }
 }
 public enum UnitBehaviourType

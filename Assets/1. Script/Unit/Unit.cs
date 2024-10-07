@@ -63,6 +63,7 @@ public class Unit : MonoBehaviour, Fighter
     public GameObject fKeyImage;
     public LayerMask friendlyLayer;
 
+    public bool die;
 
     private void OnDrawGizmosSelected()
     {
@@ -213,6 +214,7 @@ public class Unit : MonoBehaviour, Fighter
         StartCoroutine(CoSmoothHpBar(hpBar.fillAmount, 1));
         if (hp <= 0)
         {
+            die = true;
             animator.Play("Die");
         }
     }
