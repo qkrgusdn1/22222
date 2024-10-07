@@ -11,7 +11,7 @@ public class RegularUnitBehaviour : UnitBehaviour
 
     public float stopRange;
 
-    string regularStateName;
+    public string regularStateName;
 
 
     private void Start()

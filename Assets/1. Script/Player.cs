@@ -82,6 +82,8 @@ public class Player : MonoBehaviour, Fighter
 
     public bool activeStateBg;
 
+    public List<Unit> friendlyUnits = new List<Unit>();
+
 
     private void Awake()
     {
@@ -247,7 +249,7 @@ public class Player : MonoBehaviour, Fighter
                     }
 
                     Unit unit = col.GetComponent<Unit>();
-                    Inventory weaponInventory = GameMgr.Instance.inventory;
+
                     if (unit != null)
                     {
                         if (activeStateBg)
@@ -261,17 +263,7 @@ public class Player : MonoBehaviour, Fighter
                         else
                         {
                             unit.regularStateBg.SetActive(true);
-                            activeStateBg = true;
-                            IsStop = true;
-                            Cursor.lockState = CursorLockMode.None;
-                            Cursor.visible = true;
-                            inventoryBg.SetActive(false);
-                            weaponInventory.selectImage.gameObject.SetActive(false);
-                            weaponInventory.selectDescription.gameObject.SetActive(false);
-                            for (int i = 0; i < weaponInventory.buttons.Count; i++)
-                            {
-                                weaponInventory.buttons[i].gameObject.SetActive(false);
-                            }
+                            OnRegularUnitState();
                         }
                         break;
                     }
@@ -320,6 +312,8 @@ public class Player : MonoBehaviour, Fighter
             if (!inventoryBg.activeSelf)
             {
                 inventoryBg.SetActive(true);
+                inventory.friendlyImageBasic.gameObject.SetActive(true);
+                inventory.friendlyImage.gameObject.SetActive(false);
                 IsStop = true;
                 Cursor.lockState = CursorLockMode.None;
                 Cursor.visible = true;
@@ -328,8 +322,6 @@ public class Player : MonoBehaviour, Fighter
             else if (inventoryBg.activeSelf)
             {
                 inventoryBg.SetActive(false);
-                inventory.friendlyImageBasic.gameObject.SetActive(true);
-                inventory.friendlyImage.gameObject.SetActive(false);
                 IsStop = false;
                 Cursor.lockState = CursorLockMode.Locked;
                 Cursor.visible = false;
@@ -361,9 +353,26 @@ public class Player : MonoBehaviour, Fighter
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
     }
+    
+    public void OnRegularUnitState()
+    {
+        activeStateBg = true;
+        IsStop = true;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        inventoryBg.SetActive(false);
+        GameMgr.Instance.inventory.selectImage.gameObject.SetActive(false);
+        GameMgr.Instance.inventory.selectDescription.gameObject.SetActive(false);
+        for (int i = 0; i < GameMgr.Instance.inventory.buttons.Count; i++)
+        {
+            GameMgr.Instance.inventory.buttons[i].gameObject.SetActive(false);
+        }
+
+    }
 
     void Catch(Unit unit)
     {
+        friendlyUnits.Add(unit);
         unit.curUnitBehaviour = unit.GetUnitBehaviour(UnitBehaviourType.Reguler);
         unit.curUnitBehaviour.GetComponent<UnitBehaviour>().PlayerSetting(this);
         unit.hpBar.color = Color.green;

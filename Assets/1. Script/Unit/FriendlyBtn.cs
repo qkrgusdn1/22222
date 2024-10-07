@@ -19,11 +19,12 @@ public class FriendlyBtn : MonoBehaviour
     bool set;
     Unit unit;
 
+
     private void Update()
     {
         if (set)
         {
-            inventory.friendlyHpText.text = "Hp : " + hpText + "/" + maxHpText;
+            inventory.friendlyHpText.text = "Hp : " + unit.hp.ToString() + "/" + maxHpText;
             if(unit == null)
             {
                 Destroy(gameObject);
@@ -42,7 +43,6 @@ public class FriendlyBtn : MonoBehaviour
         unitThumSprite.sprite = unit.thumSprite;
         unitImage = unit.image;
         maxHpText = unit.maxHp.ToString();
-        hpText = unit.hp.ToString();
         atkText = unit.GetComponentInChildren<Weapon>().damage.ToString();
     }
 
@@ -54,6 +54,12 @@ public class FriendlyBtn : MonoBehaviour
 
         inventory.friendlyAtkText.text = "Atk : " + atkText;
 
+        for(int i = 0; i < inventory.changeStateBtns.Length; i++)
+        {
+            inventory.changeStateBtns[i].unit = unit;
+            inventory.changeStateBtns[i].stateText = inventory.stateText;
+        }
+        
     }
 
 }

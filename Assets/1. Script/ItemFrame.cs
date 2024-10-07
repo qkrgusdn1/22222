@@ -8,6 +8,7 @@ public class ItemFrame : MonoBehaviour
 {
     public string key;
     public Image weaponImage;
+    public string weaponName;
     public string weaponDescription;
 
     [HideInInspector]
@@ -37,6 +38,7 @@ public class ItemFrame : MonoBehaviour
         weaponInventory.selectImage.sprite = weaponImage.sprite;
         weaponInventory.selectDescription.text = weaponDescription;
         weaponInventory.weaponKey = key;
+        weaponInventory.selectName.text = key;
         inventory.WeaponImageChange(weaponInventory.selectImage.sprite);
     }
 

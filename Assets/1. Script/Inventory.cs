@@ -38,6 +38,7 @@ public class Inventory : MonoBehaviour
     public List<Weapon> weapones = new List<Weapon>();
     public Image selectImage;
     public TMP_Text selectDescription;
+    public TMP_Text selectName;
 
     public GameObject friendlyBtnGroup;
 
@@ -54,7 +55,8 @@ public class Inventory : MonoBehaviour
 
     public Sprite weaponFrameBgSprite;
 
-
+    public ChangeStateBtn[] changeStateBtns;
+    public TMP_Text stateText;
 
 
     private void Start()

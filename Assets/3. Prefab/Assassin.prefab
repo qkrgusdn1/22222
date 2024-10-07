@@ -109,9 +109,9 @@ RectTransform:
   - {fileID: 2690878415294934064}
   m_Father: {fileID: 7614193929196574529}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 812.86633, y: -50}
   m_SizeDelta: {x: 442.5438, y: 221.2719}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8206030690041479867
@@ -377,9 +377,9 @@ RectTransform:
   - {fileID: 1178099092774515420}
   m_Father: {fileID: 7614193929196574529}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 1354.7772, y: -50}
   m_SizeDelta: {x: 442.5438, y: 221.2719}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &8800155278609468213
@@ -1510,9 +1510,9 @@ RectTransform:
   - {fileID: 7898977606905033956}
   m_Father: {fileID: 7614193929196574529}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchorMin: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 1}
+  m_AnchoredPosition: {x: 270.95544, y: -50}
   m_SizeDelta: {x: 442.5438, y: 221.2719}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &3565484384895904810
@@ -3219,7 +3219,7 @@ MonoBehaviour:
   catchBarImage: {fileID: 5343288104488611585}
   animationEventHandler: {fileID: 191329207737042943}
   attackTimer: 0
-  maxAttackTimer: 3
+  maxAttackTimer: 1
   endAttack: 0
   unitName: Assassin
   attackAmount: 0
@@ -3325,6 +3325,7 @@ MonoBehaviour:
   player: {fileID: 0}
   regularUnitState: 0
   stopRange: 3
+  regularStateName: 
 --- !u!114 &4331817136981305367
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -60,7 +60,6 @@ public class Unit : MonoBehaviour, Fighter
     public Sprite image;
 
     public UnitBehaviourType unitBehaviourType;
-
     public GameObject fKeyImage;
     public LayerMask friendlyLayer;
 
