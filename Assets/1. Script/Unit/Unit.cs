@@ -65,6 +65,9 @@ public class Unit : MonoBehaviour, Fighter
 
     public bool die;
 
+    public bool zoneUnit;
+    public Transform spawnPoint;
+
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

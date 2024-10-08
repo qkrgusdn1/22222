@@ -10,6 +10,7 @@ public class ItemFrame : MonoBehaviour
     public Image weaponImage;
     public string weaponName;
     public string weaponDescription;
+    public string weaponAtkDescription;
 
     [HideInInspector]
     public InventoryItem inventoryItem;
@@ -37,6 +38,7 @@ public class ItemFrame : MonoBehaviour
         }
         weaponInventory.selectImage.sprite = weaponImage.sprite;
         weaponInventory.selectDescription.text = weaponDescription;
+        weaponInventory.selectAtkDescription.text = "Atk : " + weaponAtkDescription;
         weaponInventory.weaponKey = key;
         weaponInventory.selectName.text = key;
         inventory.WeaponImageChange(weaponInventory.selectImage.sprite);
@@ -55,6 +57,7 @@ public class ItemFrame : MonoBehaviour
             inventoryItem = item;
             weaponImage.sprite = item.sprite;
             weaponDescription = item.description;
+            weaponAtkDescription = item.atkDescription;
             key = inventoryItem.name;
         }
         

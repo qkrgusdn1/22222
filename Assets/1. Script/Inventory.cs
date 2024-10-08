@@ -4,6 +4,7 @@ using TMPro;
 using Unity.VisualScripting;
 using Unity.VisualScripting.FullSerializer;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.U2D;
 using UnityEngine.UI;
 
@@ -39,6 +40,7 @@ public class Inventory : MonoBehaviour
     public Image selectImage;
     public TMP_Text selectDescription;
     public TMP_Text selectName;
+    public TMP_Text selectAtkDescription;
 
     public GameObject friendlyBtnGroup;
 
@@ -90,11 +92,11 @@ public class Inventory : MonoBehaviour
         }
     }
 
-    public void AddItem(string key, Sprite sprite, string description)
+    public void AddItem(string key, Sprite sprite, string description, string atkatkDescription)
     {
         if (items.ContainsKey(key) == false)
         {
-            items.Add(key, new InventoryItem(key, sprite, description));
+            items.Add(key, new InventoryItem(key, sprite, description, atkatkDescription));
         }
 
         items[key].count++;
@@ -156,15 +158,17 @@ public class Inventory : MonoBehaviour
 [System.Serializable]
 public class InventoryItem
 {
-    public InventoryItem(string name, Sprite sprite, string description)
+    public InventoryItem(string name, Sprite sprite, string description, string atkDescription)
     {
         this.name = name;
         this.sprite = sprite;
         this.description = description;
+        this.atkDescription = atkDescription;
     }
     public Sprite sprite;
     public string name;
     public string description;
+    public string atkDescription;
     public int count;
 }
 

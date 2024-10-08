@@ -22,7 +22,7 @@ public class FriendlyBtn : MonoBehaviour
 
     private void Start()
     {
-        player = GetComponentInParent<Player>();
+        player = GameMgr.Instance.player;
     }
 
     private void Update()

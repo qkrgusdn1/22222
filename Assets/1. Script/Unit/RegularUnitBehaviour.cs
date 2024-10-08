@@ -16,7 +16,6 @@ public class RegularUnitBehaviour : UnitBehaviour
 
     private void Start()
     {
-        regularUnitState = RegularUnitState.Defender;
         regularStateName = "사수";
         unit.regularStateText.text = "현재 아군 상태 : " + regularStateName;
     }
@@ -31,7 +30,15 @@ public class RegularUnitBehaviour : UnitBehaviour
 
     private void Update()
     {
-        if(player != null && regularUnitState != RegularUnitState.Defender)
+        if (unit.die)
+            return;
+
+        if(unit.unitState == UnitState.KnockDown)
+        {
+            regularUnitState = RegularUnitState.KnockDown;
+        }
+
+        if(player != null && regularUnitState != RegularUnitState.Defender && regularUnitState != RegularUnitState.KnockDown)
         {
             float playerdis = Vector3.Distance(unit.rangePoint.transform.position, player.transform.position);
             if (playerdis <= stopRange)
@@ -48,12 +55,17 @@ public class RegularUnitBehaviour : UnitBehaviour
 
     public void OnClickedChangeRegularUnitStateBtn(string regularStateBtnName)
     {
+        if (regularUnitState == RegularUnitState.KnockDown)
+        {
+            regularStateName = "기절";
+            return;
+        }
+            
         if (Enum.TryParse(regularStateBtnName, out RegularUnitState state))
         {
             regularUnitState = state;
         }
-
-        if(regularUnitState == RegularUnitState.Follow)
+        if (regularUnitState == RegularUnitState.Follow)
         {
             unit.EnterState(UnitState.Approach);
             regularStateName = "따라오기";
@@ -74,6 +86,11 @@ public class RegularUnitBehaviour : UnitBehaviour
 
     public override void UpdateApproachState()
     {
+
+        if(regularUnitState == RegularUnitState.KnockDown)
+        {
+            return;
+        }
 
         if (regularUnitState == RegularUnitState.Follow || regularUnitState == RegularUnitState.Guard && unit.target == null)
         {
@@ -102,5 +119,6 @@ public enum RegularUnitState
 {
     Guard,
     Defender,
-    Follow
+    Follow,
+    KnockDown
 }

@@ -17,7 +17,7 @@ public class GameMgr : MonoBehaviour
     }
 
     public Inventory inventory;
-
+    public Player player;
     public float maxOneStarTimer;
     public float maxTwoStarTimer;
     public float maxThreeStarTimer;

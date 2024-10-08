@@ -134,8 +134,8 @@ MonoBehaviour:
   itemType: 0
   upDownSpeed: 0.3
   upDownDistance: 0.3
-  description: "\uAE30\uBCF8\uC73C\uB85C \uC8FC\uC5B4\uC9C0\uB294 \uC804\uC0AC\uC758
-    \uAC80"
+  description: "\uAC1C \uC13C \uAC80"
+  atkDescription: 80
   rotationSpeed: 30
   body: {fileID: 243219608592339679}
 --- !u!136 &3297600391022405621

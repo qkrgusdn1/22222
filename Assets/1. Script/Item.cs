@@ -1,9 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditorInternal.Profiling.Memory.Experimental;
 using UnityEngine;
-using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
-using static UnityEditor.Progress;
 
 public class Item : MonoBehaviour
 {
@@ -17,6 +14,8 @@ public class Item : MonoBehaviour
     public float upDownDistance;
 
     public string description;
+
+    public string atkDescription;
 
     public float rotationSpeed;
 
@@ -37,14 +36,13 @@ public class Item : MonoBehaviour
     {
         if (itemType == ItemType.weapon)
         {
-
             for (int i = 0; i < GameMgr.Instance.inventory.itemFrames.Count; i++)
             {
                 if (string.IsNullOrEmpty(GameMgr.Instance.inventory.itemFrames[i].key) && GameMgr.Instance.inventory.items.ContainsKey(key) == false)
                 {
-                    GameMgr.Instance.inventory.items.Add(key, new InventoryItem(key, sprite, description));
-                    GameMgr.Instance.inventory.itemFrames[i].SetInventoryItem(new InventoryItem(key, sprite, description));
-                    GameMgr.Instance.inventory.AddItem(key, sprite, description);
+                    GameMgr.Instance.inventory.items.Add(key, new InventoryItem(key, sprite, description, atkDescription));
+                    GameMgr.Instance.inventory.itemFrames[i].SetInventoryItem(new InventoryItem(key, sprite, description, atkDescription));
+                    GameMgr.Instance.inventory.AddItem(key, sprite, description, atkDescription);
                     break;
                 }
             }

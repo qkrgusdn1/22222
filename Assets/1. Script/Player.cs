@@ -1,3 +1,4 @@
+using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -89,6 +90,7 @@ public class Player : MonoBehaviour, Fighter
 
     private void Awake()
     {
+        GameMgr.Instance.player = this;
         animationEventHandler = bodyTr.GetComponent<AnimationEventHandler>();
         inventory = GetComponentInChildren<Inventory>();
         animationEventHandler.startAttackListener += StartAttack;
@@ -414,11 +416,11 @@ public class Player : MonoBehaviour, Fighter
         unit.EnterState(UnitState.Idle);
         unit.animator.SetBool("IsKnockDown", false);
         unit.agent.isStopped = false;
-
         FriendlyBtn friendlyBtn = Instantiate(friendlyBtnPrefab, inventory.friendlyBtnGroup.transform);
         friendlyBtns.Add(friendlyBtn);
         friendlyBtn.SetFriendlyBtn(inventory, unit);
-
+        unit.unitState = UnitState.Idle;
+        unit.GetComponent<RegularUnitBehaviour>().regularUnitState = RegularUnitState.Defender;
         catchTarget = null;
     }
 

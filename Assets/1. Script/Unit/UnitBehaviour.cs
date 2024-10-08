@@ -19,7 +19,6 @@ public abstract class UnitBehaviour : MonoBehaviour
     }
     public virtual void EnterState(UnitState unitState)
     {
-        Debug.Log($"Entering state: {unitState}");
         if (unitState == UnitState.Idle)
         {
             unit.agent.isStopped = true;
@@ -41,7 +40,6 @@ public abstract class UnitBehaviour : MonoBehaviour
 
     public virtual void UpdateState(UnitState state)
     {
-        Debug.Log($"UpdateState: {state}");
         if (unit.unitState == UnitState.Idle)
         {
             UpdateIdleState();
@@ -87,7 +85,6 @@ public abstract class UnitBehaviour : MonoBehaviour
 
     public virtual void UpdateApproachState()
     {
-        Debug.Log("UpdateApproachState");
         //어떤 코드가 필요한가요?
 
         //타겟이 null일때 , 멀때 -> Idle
@@ -96,13 +93,20 @@ public abstract class UnitBehaviour : MonoBehaviour
         //타겟이 멀면 Idle로 전환
         if (distanceToPlayer > unit.targetingRange)
         {
-            unit.target = null;
-            unit.EnterState(UnitState.Idle);
+            if (unit.zoneUnit)
+            {
+
+            }
+            else
+            {
+                unit.target = null;
+                unit.EnterState(UnitState.Idle);
+            }
+            
             return;
         }
         else if (distanceToPlayer < unit.attackRange)
         {
-            Debug.Log("AttackTime");
             unit.endAttack = false;
             unit.EnterState(UnitState.Attack);
             return;
@@ -121,6 +125,10 @@ public abstract class UnitBehaviour : MonoBehaviour
 
     public virtual void UpdateAttackState()
     {
+        if (unit.hp / unit.maxHp <= 0.2f)
+        {
+            unit.EnterState(UnitState.KnockDown);
+        }
         if (distanceToPlayer > unit.attackRange)
         {
             if (unit.endAttack)
@@ -140,7 +148,6 @@ public abstract class UnitBehaviour : MonoBehaviour
             unit.EnterState(UnitState.Idle);
             return;
         }
-
     }
 
     public virtual void UpdateFKeyImage(bool active)
