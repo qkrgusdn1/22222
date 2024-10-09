@@ -7,6 +7,14 @@ public class Zone : MonoBehaviour
 
     public Unit[] units;
 
+    public float zoneRange;
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, zoneRange);
+    }
+
     private void Start()
     {
         StartSpwan();
@@ -20,7 +28,8 @@ public class Zone : MonoBehaviour
             //나중에 포톤 인스테이트로 바꾸기
             Unit unit = Instantiate(units[Random.Range(0, units.Length)], spawnPoints[i].position, Quaternion.identity, spawnPoints[i]);
             unit.zoneUnit = true;
-            unit.spawnPoint = spawnPoints[i];
+            unit.turnPoint = spawnPoints[i];
+            unit.zone = this;
         }
     }
     private void MixSpawnPoints()

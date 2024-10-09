@@ -21,4 +21,5 @@ public class GameMgr : MonoBehaviour
     public float maxOneStarTimer;
     public float maxTwoStarTimer;
     public float maxThreeStarTimer;
+    public GameObject trunPointGroup;
 }

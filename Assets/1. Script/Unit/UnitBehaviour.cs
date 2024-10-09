@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public abstract class UnitBehaviour : MonoBehaviour
@@ -7,8 +5,9 @@ public abstract class UnitBehaviour : MonoBehaviour
     public Unit unit;
     public UnitBehaviourType unitBehaviourType;
     public float distanceToPlayer;
+    public float zoneDistanceToPlayer;
     public Player player;
-
+    public bool targetting;
     public void PlayerSetting(Player player)
     {
         this.player = player;
@@ -22,6 +21,8 @@ public abstract class UnitBehaviour : MonoBehaviour
         if (unitState == UnitState.Idle)
         {
             unit.agent.isStopped = true;
+            unit.agent.velocity = new Vector3(0, unit.rb.velocity.y, 0);
+            unit.rb.velocity = new Vector3(0, unit.rb.velocity.y, 0);
         }
         if (unitState == UnitState.Approach)
         {
@@ -56,31 +57,35 @@ public abstract class UnitBehaviour : MonoBehaviour
         {
             return;
         }
-
-        if (unit.rangePoint != null && unit.target != null)
-        {
-            distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
-            if(distanceToPlayer >= unit.targetingRange)
-            {
-                unit.EnterState(UnitState.Idle);
-                unit.agent.isStopped = true;
-                unit.agent.velocity = new Vector3(0, unit.rb.velocity.y, 0);
-                unit.rb.velocity = new Vector3(0, unit.rb.velocity.y, 0);
-            }
-        }
     }
 
-    public virtual void UpdateIdleState() //Idle 행동 - 어떤 활동 필요?
+    public virtual void UpdateIdleState()
     {
         unit.animator.SetBool("IsRunning", false);
-        Debug.Log("UpdateIdleState");
         Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
 
-        if (cols.Length <= 0)
-            return;
-        unit.target = cols[0].gameObject;
-        unit.EnterState(UnitState.Approach);
-        
+        if (cols.Length > 0)
+        {
+            GameObject closestTarget = null;
+            float closestDistance = Mathf.Infinity;
+
+            foreach (Collider col in cols)
+            {
+                float distance = Vector3.Distance(transform.position, col.transform.position);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestTarget = col.gameObject;
+                }
+            }
+
+            if (closestTarget != null)
+            {
+                unit.target = closestTarget;
+                unit.EnterState(UnitState.Approach);
+                return;
+            }
+        }
     }
 
     public virtual void UpdateApproachState()
@@ -90,19 +95,9 @@ public abstract class UnitBehaviour : MonoBehaviour
         //타겟이 null일때 , 멀때 -> Idle
         //타겟이 공격 범위 안으로 들어왔을 때 -> Attack
         distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
-        //타겟이 멀면 Idle로 전환
         if (distanceToPlayer > unit.targetingRange)
         {
-            if (unit.zoneUnit)
-            {
-
-            }
-            else
-            {
-                unit.target = null;
-                unit.EnterState(UnitState.Idle);
-            }
-            
+            unit.target = null;
             return;
         }
         else if (distanceToPlayer < unit.attackRange)
@@ -111,17 +106,32 @@ public abstract class UnitBehaviour : MonoBehaviour
             unit.EnterState(UnitState.Attack);
             return;
         }
+        Move(unit.target.gameObject);
+    }
+
+    public void Move(GameObject target)
+    {
+        Debug.Log(target);
         unit.animator.SetBool("IsRunning", true);
-        //******* 수정된 코드 ********
-        unit.agent.SetDestination(unit.target.transform.position);
+        unit.agent.SetDestination(target.transform.position);
 
         //타겟을 바라보는 코드
-        Vector3 direction = (unit.target.transform.position - transform.position).normalized;
+        Vector3 direction = (target.transform.position - transform.position).normalized;
         direction.y = 0;
         Quaternion lookRotation = Quaternion.LookRotation(direction);
         unit.body.transform.rotation = Quaternion.Slerp(unit.body.transform.rotation, lookRotation, Time.deltaTime * 100);
     }
-
+    public void MoveTrunPoint()
+    {
+        if (Vector3.Distance(transform.position, unit.turnPoint.position) > 0.5f)
+        {
+            Move(unit.turnPoint.gameObject);
+        }
+        else if (Vector3.Distance(transform.position, unit.turnPoint.position) <= 0.5f)
+        {
+            unit.EnterState(UnitState.Idle);
+        }
+    }
 
     public virtual void UpdateAttackState()
     {
@@ -133,6 +143,11 @@ public abstract class UnitBehaviour : MonoBehaviour
         {
             if (unit.endAttack)
             {
+                Vector3 direction = (unit.target.transform.position - transform.position).normalized;
+                direction.y = 0;
+                Quaternion lookRotation = Quaternion.LookRotation(direction);
+
+                unit.body.transform.rotation = Quaternion.Slerp(unit.body.transform.rotation, lookRotation, Time.deltaTime * 1000);
                 unit.attackTimer = 0;
                 unit.EnterState(UnitState.Approach);
                 unit.agent.isStopped = false;
@@ -140,9 +155,7 @@ public abstract class UnitBehaviour : MonoBehaviour
             return;
         }
         unit.attackTimer -= Time.deltaTime;
-        unit.agent.isStopped = true;
-        unit.agent.velocity = new Vector3(0, unit.rb.velocity.y, 0);
-        unit.rb.velocity = new Vector3(0, unit.rb.velocity.y, 0);
+
         if (unit.attackTimer <= 0)
         {
             unit.EnterState(UnitState.Idle);
@@ -152,11 +165,11 @@ public abstract class UnitBehaviour : MonoBehaviour
 
     public virtual void UpdateFKeyImage(bool active)
     {
-        if(unitBehaviourType == UnitBehaviourType.Reguler)
+        if (unitBehaviourType == UnitBehaviourType.Reguler)
         {
             unit.fKeyImage.gameObject.SetActive(active);
         }
-        else if(unitBehaviourType == UnitBehaviourType.Wild)
+        else if (unitBehaviourType == UnitBehaviourType.Wild)
         {
             unit.catchBarImage.fillAmount = 0;
             unit.catchBarBgImage.SetActive(active);
@@ -166,7 +179,7 @@ public abstract class UnitBehaviour : MonoBehaviour
         {
 
         }
-            unit.catchBarImage.fillAmount = 0;
+        unit.catchBarImage.fillAmount = 0;
     }
 }
 public enum UnitBehaviourType

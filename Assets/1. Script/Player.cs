@@ -420,6 +420,7 @@ public class Player : MonoBehaviour, Fighter
         friendlyBtns.Add(friendlyBtn);
         friendlyBtn.SetFriendlyBtn(inventory, unit);
         unit.unitState = UnitState.Idle;
+        unit.zoneUnit = false;
         unit.GetComponent<RegularUnitBehaviour>().regularUnitState = RegularUnitState.Defender;
         catchTarget = null;
     }

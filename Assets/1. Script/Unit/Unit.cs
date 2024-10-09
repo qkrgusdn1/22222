@@ -26,6 +26,7 @@ public class Unit : MonoBehaviour, Fighter
     public float targetingRange;
     public float attackRange;
     public float knockDownRange;
+    public float zoneDistanceToPlayer;
 
     public Weapon weapon;
 
@@ -58,6 +59,7 @@ public class Unit : MonoBehaviour, Fighter
     public Sprite thumSprite;
 
     public Sprite image;
+    public Zone zone;
 
     public UnitBehaviourType unitBehaviourType;
     public GameObject fKeyImage;
@@ -66,7 +68,9 @@ public class Unit : MonoBehaviour, Fighter
     public bool die;
 
     public bool zoneUnit;
-    public Transform spawnPoint;
+    public Transform turnPoint;
+    public GameObject turnPointObj;
+    public GameObject turnPointPrefab;
 
     private void OnDrawGizmosSelected()
     {
@@ -91,6 +95,7 @@ public class Unit : MonoBehaviour, Fighter
         rb = GetComponent<Rigidbody>(); 
         agent = GetComponent<NavMeshAgent>();
         agent.speed = moveSpeed;
+        
     }
 
     public UnitBehaviour GetUnitBehaviour(UnitBehaviourType type)
@@ -105,6 +110,9 @@ public class Unit : MonoBehaviour, Fighter
         }
         else if(type == UnitBehaviourType.Reguler)
         {
+            GameObject turnPoint = Instantiate(turnPointPrefab, transform.position, Quaternion.identity, GameMgr.Instance.trunPointGroup.transform);
+            turnPointObj = turnPoint;
+            this.turnPoint = turnPointObj.transform;
             targetLayer = LayerMask.GetMask("Enemy");
             gameObject.layer = LayerMask.NameToLayer("Friendly");
             weapon.hitLayerMask = targetLayer;

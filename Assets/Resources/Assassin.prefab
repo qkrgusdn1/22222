@@ -3208,6 +3208,7 @@ MonoBehaviour:
   targetingRange: 10
   attackRange: 1.6
   knockDownRange: 2
+  zoneDistanceToPlayer: 0
   weapon: {fileID: 4803975792115509913}
   hp: 0
   maxHp: 100
@@ -3230,12 +3231,15 @@ MonoBehaviour:
   regularStateText: {fileID: 4700578594793770995}
   thumSprite: {fileID: 21300000, guid: 8e56c0bddf3d71347ac2b564cb84fae2, type: 3}
   image: {fileID: 21300000, guid: c5362fe32e3bcee458462821e84e0410, type: 3}
+  zone: {fileID: 0}
   unitBehaviourType: 0
   fKeyImage: {fileID: 5767905668630349494}
   friendlyLayer:
     serializedVersion: 2
     m_Bits: 512
   die: 0
+  zoneUnit: 0
+  spawnPoint: {fileID: 0}
 --- !u!136 &684338821514662603
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -3243,7 +3247,7 @@ CapsuleCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5926558597782652070}
-  m_Material: {fileID: 13400000, guid: 2f8eb2398cfb2c74db226bfe21b018cb, type: 2}
+  m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -3323,7 +3327,9 @@ MonoBehaviour:
   unit: {fileID: 5921548955846739441}
   unitBehaviourType: 1
   distanceToPlayer: 0
+  zoneDistanceToPlayer: 0
   player: {fileID: 0}
+  targetting: 0
   regularUnitState: 0
   stopRange: 3
   regularStateName: 
@@ -3342,7 +3348,9 @@ MonoBehaviour:
   unit: {fileID: 5921548955846739441}
   unitBehaviourType: 0
   distanceToPlayer: 0
+  zoneDistanceToPlayer: 0
   player: {fileID: 0}
+  targetting: 0
 --- !u!1 &6045259649394615591
 GameObject:
   m_ObjectHideFlags: 0

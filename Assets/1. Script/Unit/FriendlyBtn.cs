@@ -58,7 +58,7 @@ public class FriendlyBtn : MonoBehaviour
         inventory.friendlyImage.gameObject.SetActive(true);
         inventory.friendlyImage.sprite = unitImage;
         inventory.friendlyAtkText.text = "Atk : " + atkText;
-       
+        
         
 
         for (int i = 0; i < inventory.changeStateBtns.Length; i++)
