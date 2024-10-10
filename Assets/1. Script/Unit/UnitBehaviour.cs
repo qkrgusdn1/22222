@@ -162,17 +162,18 @@ public abstract class UnitBehaviour : MonoBehaviour
 
         if (unit.attackTimer <= 0)
         {
-            if (Vector3.Distance(transform.position, unit.turnPoint.position) > 0.5f && unit.target == null && unit.zoneUnit)
-            {
-                unit.agent.isStopped = false;
-                unit.EnterState(UnitState.Approach);
-                return;
-            }
-            else
-            {
-                unit.EnterState(UnitState.Idle);
-                return;
-            }
+            unit.EnterState(UnitState.Idle);
+            return;
+            //if (unit.turnPoint != null&& Vector3.Distance(transform.position, unit.turnPoint.position) > 0.5f && unit.target == null && unit.zoneUnit)
+            //{
+            //    unit.agent.isStopped = false;
+            //    unit.EnterState(UnitState.Approach);
+            //    return;
+            //}
+            //else if(!unit.zoneUnit)
+            //{
+                
+            //}
             
         }
     }

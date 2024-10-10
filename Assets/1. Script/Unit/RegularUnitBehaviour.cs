@@ -160,26 +160,7 @@ public class RegularUnitBehaviour : UnitBehaviour
                 MoveTrunPoint();
                 return;
             }
-            GameObject closestTarget = null;
-            float closestDistance = Mathf.Infinity;
-
-            foreach (Collider col in cols)
-            {
-                float distance = Vector3.Distance(transform.position, col.transform.position);
-                if (distance < closestDistance)
-                {
-                    closestDistance = distance;
-                    closestTarget = col.gameObject;
-                }
-            }
-
-            if (closestTarget != null)
-            {
-                unit.target = closestTarget;
-                unit.EnterState(UnitState.Approach);
-                return;
-            }
-            distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
+            
         }
 
         base.UpdateApproachState();

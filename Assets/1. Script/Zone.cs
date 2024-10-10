@@ -15,11 +15,6 @@ public class Zone : MonoBehaviour
         Gizmos.DrawWireSphere(transform.position, zoneRange);
     }
 
-    private void Start()
-    {
-        StartSpwan();
-    }
-
     public void StartSpwan()
     {
         MixSpawnPoints();
