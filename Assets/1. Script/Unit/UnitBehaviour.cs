@@ -107,11 +107,13 @@ public abstract class UnitBehaviour : MonoBehaviour
             return;
         }
         Move(unit.target.gameObject);
+        
     }
 
     public void Move(GameObject target)
     {
         Debug.Log(target);
+        unit.agent.isStopped = false;
         unit.animator.SetBool("IsRunning", true);
         unit.agent.SetDestination(target.transform.position);
 
@@ -123,6 +125,13 @@ public abstract class UnitBehaviour : MonoBehaviour
     }
     public void MoveTrunPoint()
     {
+        unit.agent.isStopped = false;
+        Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
+        if (cols.Length > 0)
+        {
+            unit.target = cols[0].gameObject;
+            distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
+        }
         if (Vector3.Distance(transform.position, unit.turnPoint.position) > 0.5f)
         {
             Move(unit.turnPoint.gameObject);
@@ -143,11 +152,6 @@ public abstract class UnitBehaviour : MonoBehaviour
         {
             if (unit.endAttack)
             {
-                Vector3 direction = (unit.target.transform.position - transform.position).normalized;
-                direction.y = 0;
-                Quaternion lookRotation = Quaternion.LookRotation(direction);
-
-                unit.body.transform.rotation = Quaternion.Slerp(unit.body.transform.rotation, lookRotation, Time.deltaTime * 1000);
                 unit.attackTimer = 0;
                 unit.EnterState(UnitState.Approach);
                 unit.agent.isStopped = false;
@@ -158,8 +162,18 @@ public abstract class UnitBehaviour : MonoBehaviour
 
         if (unit.attackTimer <= 0)
         {
-            unit.EnterState(UnitState.Idle);
-            return;
+            if (Vector3.Distance(transform.position, unit.turnPoint.position) > 0.5f && unit.target == null && unit.zoneUnit)
+            {
+                unit.agent.isStopped = false;
+                unit.EnterState(UnitState.Approach);
+                return;
+            }
+            else
+            {
+                unit.EnterState(UnitState.Idle);
+                return;
+            }
+            
         }
     }
 
