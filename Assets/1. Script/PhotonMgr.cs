@@ -16,10 +16,14 @@ public class PhotonMgr : MonoBehaviourPunCallbacks
             return instance;
         }
     }
-
+    public bool IsReadyToJoinRoom()
+    {
+        return PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InLobby;
+    }
     private void Awake()
     {
         instance = this;
+        DontDestroyOnLoad(gameObject);
     }
     private void Start()
     {
@@ -67,6 +71,7 @@ public class PhotonMgr : MonoBehaviourPunCallbacks
     {
         base.OnJoinedLobby();
         Debug.Log("로비 접속 완료");
+        PhotonNetwork.LoadLevel("Lobby");
         //Load Scene 이동 처리 
     }
 
@@ -79,13 +84,22 @@ public class PhotonMgr : MonoBehaviourPunCallbacks
 
     public void TryToJoinRoom()
     {
-        PhotonNetwork.JoinRandomOrCreateRoom(); //임의의 룸 접속 or 방 생성
+        if (PhotonNetwork.InLobby)
+        {
+            Debug.Log("로비에 있으므로 방에 참여 시도...");
+            PhotonNetwork.JoinRandomOrCreateRoom();
+        }
+        else
+        {
+            Debug.Log("로비에 있지 않습니다. 방에 참여할 수 없습니다.");
+        }
     }
 
     public override void OnJoinedRoom()
     {
         base.OnJoinedRoom();
         Debug.Log("Room Name : " + PhotonNetwork.CurrentRoom.Name);
+        PhotonNetwork.LoadLevel("Wating");
     }
 
     public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)

@@ -5,7 +5,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class GameMgr : MonoBehaviour
+public class GameMgr : MonoBehaviourPunCallbacks
 {
     private static GameMgr instance;
     public static GameMgr Instance
@@ -16,12 +16,6 @@ public class GameMgr : MonoBehaviour
     {
         instance = this;
     }
-
-    private void Start()
-    {
-        GameObject obj = PhotonNetwork.Instantiate("Character", Vector3.zero, Quaternion.identity);
-        character = obj.GetComponent<Character>();
-    }
     public Character character;
     public SpawnPoint[] spawnPoints;
     public Inventory inventory;
@@ -31,4 +25,51 @@ public class GameMgr : MonoBehaviour
     public float maxThreeStarTimer;
     public GameObject trunPointGroup;
     public Zone[] zones;
+    public int spawnPointIdx;
+    public TMP_Text spawnCountText;
+    public float spawnCount;
+    public float maxSpawnCount;
+    bool gameStart;
+    private void Start()
+    {
+        GameObject obj = PhotonNetwork.Instantiate("Character", Vector3.zero, Quaternion.identity);
+        photonView.RPC("RPCCountDown", RpcTarget.All);
+        character = obj.GetComponent<Character>();
+    }
+    
+
+    [PunRPC]
+    public void RPCCountDown()
+    {
+        StartCoroutine(CountDown());
+    }
+
+    IEnumerator CountDown()
+    {
+        spawnCount = maxSpawnCount;
+        while (true)
+        {
+            yield return null;
+            if (gameStart)
+            {
+                character.StartGame(spawnPoints[spawnPointIdx].transform.position);
+                break;
+            }
+                
+            if (spawnCount >= 0)
+            {
+                spawnCount -= Time.deltaTime;
+                spawnCountText.text = spawnCount.ToString("F0");
+            }
+            else
+            {
+                for(int i = 0; i < spawnPointIdx; i++)
+                {
+
+                }
+            }
+        }
+
+    }
+    
 }

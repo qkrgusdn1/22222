@@ -10,7 +10,7 @@ public class LodingMgr : MonoBehaviour
     {
         if (PhotonNetwork.InLobby)
         {
-            SceneManager.LoadScene("Lobby");
+            
         }
     }
 }

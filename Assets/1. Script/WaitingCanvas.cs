@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class WaitingCanvas : MonoBehaviour
 {
-    int idx;
     public void OnClickedSpawnPointBtn(int idx)
     {
-        this.idx = idx;
+        GameMgr.Instance.spawnPointIdx = idx;
         for (int i = 0; i < GameMgr.Instance.spawnPoints.Length; i++)
         {
             if (GameMgr.Instance.spawnPoints[i].spawnIdx == idx)
