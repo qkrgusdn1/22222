@@ -10,11 +10,16 @@ public class WatingMgr : MonoBehaviourPunCallbacks
     public TMP_Text waitingText;
     bool start;
     int countDown = 10;
+    public GameObject otherPlayerModel;
+
+    public TMP_Text playerNickName;
+    public TMP_Text otherplayerNickName;
 
     private void Start()
     {
         photonView.RPC("RPCEnteredPlayer", RpcTarget.All);
         StartCoroutine(WaitingLodding());
+        playerNickName.text = PhotonMgr.Instance.nickName;
     }
 
     [PunRPC]
@@ -22,6 +27,7 @@ public class WatingMgr : MonoBehaviourPunCallbacks
     {
         if (PhotonNetwork.CurrentRoom.PlayerCount == 2 && PhotonNetwork.IsMasterClient)
         {
+            otherPlayerModel.SetActive(true);
             start = true;
             PhotonNetwork.CurrentRoom.IsOpen = false;
             PhotonNetwork.CurrentRoom.IsVisible = false;

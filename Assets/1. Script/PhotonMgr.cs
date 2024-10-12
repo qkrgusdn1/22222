@@ -4,7 +4,6 @@ using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
 
-//포톤 기능에 따른 콜백 처리 받을 수 있게 MonoBehaviourPunCallbacks 클래스 상속
 public class PhotonMgr : MonoBehaviourPunCallbacks
 {
     private static PhotonMgr instance;
@@ -25,6 +24,9 @@ public class PhotonMgr : MonoBehaviourPunCallbacks
         instance = this;
         DontDestroyOnLoad(gameObject);
     }
+
+    public string nickName;
+
     private void Start()
     {
         TryToJoinServer();
@@ -46,7 +48,12 @@ public class PhotonMgr : MonoBehaviourPunCallbacks
         }
 
     }
-
+    public void CreateRoom(string roomTitle, int maxPlayer)
+    {
+        RoomOptions roomOptions = new RoomOptions();
+        roomOptions.MaxPlayers = maxPlayer;
+        PhotonNetwork.CreateRoom(roomTitle, roomOptions);
+    }
     //마스터 서버 접속되면 호출되는 콜백 함수
     public override void OnConnectedToMaster()
     {
@@ -84,15 +91,7 @@ public class PhotonMgr : MonoBehaviourPunCallbacks
 
     public void TryToJoinRoom()
     {
-        if (PhotonNetwork.InLobby)
-        {
-            Debug.Log("로비에 있으므로 방에 참여 시도...");
-            PhotonNetwork.JoinRandomOrCreateRoom();
-        }
-        else
-        {
-            Debug.Log("로비에 있지 않습니다. 방에 참여할 수 없습니다.");
-        }
+        PhotonNetwork.JoinRandomOrCreateRoom();
     }
 
     public override void OnJoinedRoom()

@@ -10,7 +10,7 @@ EditorBuildSettings:
     guid: f2ff89170ca241644ba3ef7f3c15542a
   - enabled: 1
     path: Assets/0. Scenes/Lobby.unity
-    guid: bf53b88239ffbdb43b24a1f97f6d3f90
+    guid: d52fbadbe9780f64c9e3eb1ec76fd0fe
   - enabled: 1
     path: Assets/0. Scenes/Wating.unity
     guid: 53bd25ef7ad1e814387599db7f469b3f
