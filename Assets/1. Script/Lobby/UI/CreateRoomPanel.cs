@@ -10,7 +10,11 @@ public class CreateRoomPanel : MonoBehaviour
     public TMP_InputField roomTitleInputField;
     public void OnClickedCreateRoomBtn()
     {
-        if (string.IsNullOrEmpty(roomTitleInputField.text) && string.IsNullOrEmpty(PhotonMgr.Instance.nickName))
+        if (string.IsNullOrEmpty(LobbyMgr.Instance.nickNameInputField.text))
+        {
+            return;
+        }
+        if (string.IsNullOrEmpty(roomTitleInputField.text))
         {
             return;
         }

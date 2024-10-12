@@ -18,6 +18,13 @@ public class LobbyMgr : MonoBehaviour
     {
         instance = this;
     }
+
     public TMP_InputField nickNameInputField;
     public GameObject lodingPanel;
+    public GameObject failRoomPanel;
+
+    public void OnClikedExitBtn()
+    {
+        Application.Quit();
+    }
 }

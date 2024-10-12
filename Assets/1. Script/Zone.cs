@@ -1,11 +1,12 @@
+using Photon.Pun;
 using UnityEngine;
 
-public class Zone : MonoBehaviour
+public class Zone : MonoBehaviourPunCallbacks
 {
     public Transform[] spawnPoints;
     public int spawnAmount;
 
-    public Unit[] units;
+    public string[] unitPrefabNames;
 
     public float zoneRange;
 
@@ -14,20 +15,21 @@ public class Zone : MonoBehaviour
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, zoneRange);
     }
-
     public void StartSpwan()
     {
-        MixSpawnPoints();
+        photonView.RPC("RPCMixSpawnPoints", RpcTarget.All);
         for (int i = 0; i < spawnAmount; i++)
         {
-            //나중에 포톤 인스테이트로 바꾸기
-            Unit unit = Instantiate(units[Random.Range(0, units.Length)], spawnPoints[i].position, Quaternion.identity, spawnPoints[i]);
+            GameObject unitObject = PhotonNetwork.Instantiate(unitPrefabNames[Random.Range(0, unitPrefabNames.Length)], spawnPoints[i].position, Quaternion.identity);
+            Unit unit = unitObject.GetComponent<Unit>();
+            unitObject.transform.SetParent(spawnPoints[i]);
             unit.zoneUnit = true;
             unit.turnPoint = spawnPoints[i];
             unit.zone = this;
         }
     }
-    private void MixSpawnPoints()
+    [PunRPC]
+    public void RPCMixSpawnPoints()
     {
         for (int i = 0; i < spawnPoints.Length; i++)
         {

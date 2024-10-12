@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using Photon.Realtime;
+using System;
+using UnityEngine.SceneManagement;
 
 public class PhotonMgr : MonoBehaviourPunCallbacks
 {
@@ -82,23 +84,37 @@ public class PhotonMgr : MonoBehaviourPunCallbacks
         //Load Scene 이동 처리 
     }
 
+    public List<RoomInfo> curRoomInfos;
+
     //서버 룸 리스트 갱신 시 호출 됨
     public override void OnRoomListUpdate(List<RoomInfo> roomList)
     {
-        base.OnRoomListUpdate(roomList);
-        Debug.Log("OnRoomListUpdate 로비에 대한 룸 리스트 " + roomList.Count);
+        curRoomInfos = roomList;
     }
 
-    public void TryToJoinRoom()
+    Action failCallBack;
+    public void TryToJoinRoom(string name = null, Action failCallBack = null)
     {
-        PhotonNetwork.JoinRandomOrCreateRoom();
+        this.failCallBack = failCallBack;
+        if (string.IsNullOrEmpty(name))
+            PhotonNetwork.JoinRandomOrCreateRoom();
+        else
+        {
+            PhotonNetwork.JoinRoom(name);
+        }
+    }
+
+    public override void OnJoinRoomFailed(short returnCode, string message)
+    {
+        base.OnJoinRoomFailed(returnCode, message);
+        failCallBack?.Invoke();
     }
 
     public override void OnJoinedRoom()
     {
         base.OnJoinedRoom();
         Debug.Log("Room Name : " + PhotonNetwork.CurrentRoom.Name);
-        PhotonNetwork.LoadLevel("Wating");
+        SceneManager.LoadScene("Wating");
     }
 
     public override void OnPlayerEnteredRoom(Photon.Realtime.Player newPlayer)

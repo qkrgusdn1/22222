@@ -3155,6 +3155,8 @@ GameObject:
   - component: {fileID: 8244417012612377435}
   - component: {fileID: 898532007371936841}
   - component: {fileID: 4331817136981305367}
+  - component: {fileID: -272084268718119660}
+  - component: {fileID: 7563709489995541732}
   m_Layer: 8
   m_Name: Assassin
   m_TagString: Untagged
@@ -3354,6 +3356,45 @@ MonoBehaviour:
   zoneDistanceToPlayer: 0
   player: {fileID: 0}
   targetting: 0
+--- !u!114 &-272084268718119660
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5926558597782652070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: 7563709489995541732}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!114 &7563709489995541732
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5926558597782652070}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 1
+  m_SynchronizeRotation: 0
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
 --- !u!1 &6045259649394615591
 GameObject:
   m_ObjectHideFlags: 0
@@ -4786,6 +4827,9 @@ GameObject:
   - component: {fileID: 8897307461454897751}
   - component: {fileID: 2025833536367755740}
   - component: {fileID: 191329207737042943}
+  - component: {fileID: 5086222994692338578}
+  - component: {fileID: 8562206239902668557}
+  - component: {fileID: 1973498100170709546}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -4843,6 +4887,82 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 099b6282b7e7b934ca2f3ff9362ce99c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &5086222994692338578
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8961376880725883989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9b8c4a61274f60b4ea5fb4299cfdbf14, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowLayerWeightsInspector: 1
+  ShowParameterInspector: 1
+  m_SynchronizeParameters:
+  - Type: 4
+    SynchronizeType: 2
+    Name: IsRunning
+  - Type: 9
+    SynchronizeType: 2
+    Name: Attack0
+  - Type: 9
+    SynchronizeType: 2
+    Name: Roll
+  - Type: 4
+    SynchronizeType: 2
+    Name: IsKnockDown
+  - Type: 9
+    SynchronizeType: 2
+    Name: Attack1
+  - Type: 9
+    SynchronizeType: 2
+    Name: Attack2
+  m_SynchronizeLayers:
+  - SynchronizeType: 2
+    LayerIndex: 0
+--- !u!114 &8562206239902668557
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8961376880725883989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents:
+  - {fileID: 5086222994692338578}
+  - {fileID: 1973498100170709546}
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
+--- !u!114 &1973498100170709546
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8961376880725883989}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_SynchronizePosition: 0
+  m_SynchronizeRotation: 1
+  m_SynchronizeScale: 0
+  m_UseLocal: 1
 --- !u!1 &9026115011072600047
 GameObject:
   m_ObjectHideFlags: 0

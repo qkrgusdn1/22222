@@ -1,3 +1,4 @@
+using Photon.Pun;
 using Photon.Realtime;
 using System;
 using System.Collections;
@@ -5,7 +6,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class Player : MonoBehaviour, Fighter
+public class Player : MonoBehaviourPunCallbacks, Fighter
 {
     public float moveSpeed;
     public Transform bodyTr;
@@ -76,8 +77,11 @@ public class Player : MonoBehaviour, Fighter
     float stopAttackTime;
     public float maxStopAttackTime;
 
+    public Transform cameraPoint;
 
     public Unit catchTarget;
+
+    public GameObject canvas;
 
     float catchTimer;
     public float maxCatchTimer;
@@ -90,7 +94,13 @@ public class Player : MonoBehaviour, Fighter
 
     private void Awake()
     {
-        GameMgr.Instance.player = this;
+        if (photonView.IsMine)
+        {
+            GameMgr.Instance.player = this;
+            GameMgr.Instance.virtualCamera.Follow = cameraPoint;
+            GameMgr.Instance.inventory = inventory;
+        }
+        
         animationEventHandler = bodyTr.GetComponent<AnimationEventHandler>();
         inventory = GetComponentInChildren<Inventory>();
         animationEventHandler.startAttackListener += StartAttack;
@@ -100,7 +110,7 @@ public class Player : MonoBehaviour, Fighter
         animationEventHandler.endRollListener += EndRoll;
         mainCollider.enabled = true;
         rollCollider.enabled = false;
-        GameMgr.Instance.inventory = inventory;
+        
     }
     private void Start()
     {
@@ -111,7 +121,10 @@ public class Player : MonoBehaviour, Fighter
         rb = GetComponent<Rigidbody>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        
+        if (!photonView.IsMine)
+        {
+            canvas.SetActive(false);
+        }
     }
 
     public void Attack(Fighter target, float damage)
@@ -126,6 +139,11 @@ public class Player : MonoBehaviour, Fighter
 
     public void TakeDamage(float damage)
     {
+        photonView.RPC("RPCTakeDamage", RpcTarget.All, damage);
+    }
+    [PunRPC]
+    public void RPCTakeDamage(float damage)
+    {
         hp -= damage;
 
         hpBar.fillAmount = hp / maxHp;
@@ -135,6 +153,7 @@ public class Player : MonoBehaviour, Fighter
             animator.Play("Die");
         }
     }
+
     private IEnumerator CoSmoothHpBar(float targetFillAmount, float duration)
     {
         float elapsedTime = 0f;
@@ -181,6 +200,8 @@ public class Player : MonoBehaviour, Fighter
 
     private void Update()
     {
+        if (!photonView.IsMine)
+            return;
 
         if (stopAttackTime > 0 && !noFinshAttack)
         {
@@ -310,6 +331,8 @@ public class Player : MonoBehaviour, Fighter
             rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
         }
     }
+
+    
 
     public void ChecknearRegularUnit()
     {

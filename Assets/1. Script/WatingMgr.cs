@@ -8,35 +8,52 @@ using UnityEngine;
 public class WatingMgr : MonoBehaviourPunCallbacks
 {
     public TMP_Text waitingText;
-    bool start;
     int countDown = 10;
     public GameObject otherPlayerModel;
 
     public TMP_Text playerNickName;
     public TMP_Text otherplayerNickName;
+    Coroutine waitingCoroutine;
 
     private void Start()
     {
+        PhotonNetwork.LocalPlayer.NickName = PhotonMgr.Instance.nickName;
+        playerNickName.text = PhotonNetwork.PlayerList[0].NickName;
         photonView.RPC("RPCEnteredPlayer", RpcTarget.All);
-        StartCoroutine(WaitingLodding());
-        playerNickName.text = PhotonMgr.Instance.nickName;
+        if (PhotonNetwork.IsMasterClient)
+            waitingCoroutine = StartCoroutine(CoWaitingLodding());
+    }
+
+    [PunRPC]
+    public void RPCNickNameSetting(string otherNickName)
+    {
+        otherplayerNickName.text = otherNickName;
     }
 
     [PunRPC]
     public void RPCEnteredPlayer()
     {
-        if (PhotonNetwork.CurrentRoom.PlayerCount == 2 && PhotonNetwork.IsMasterClient)
+        if (PhotonNetwork.CurrentRoom.PlayerCount == 2)
         {
             otherPlayerModel.SetActive(true);
-            start = true;
-            PhotonNetwork.CurrentRoom.IsOpen = false;
-            PhotonNetwork.CurrentRoom.IsVisible = false;
+            if (waitingCoroutine != null)
+            {
+                StopCoroutine(waitingCoroutine);
+            }
+            string otherNickName = PhotonNetwork.PlayerList[1].NickName;
+            photonView.RPC("RPCNickNameSetting", RpcTarget.All, otherNickName);
+            if (PhotonNetwork.IsMasterClient)
+            {
+                PhotonNetwork.CurrentRoom.IsOpen = false;
+                PhotonNetwork.CurrentRoom.IsVisible = false;
+                StartCoroutine(Countdown());
+            }
+            
         }
     }
-
-    IEnumerator WaitingLodding()
+    IEnumerator CoWaitingLodding()
     {
-        while (!start)
+        while (true)
         {
             waitingText.text = "플레이어 대기 중.";
             yield return new WaitForSeconds(1);
@@ -45,17 +62,27 @@ public class WatingMgr : MonoBehaviourPunCallbacks
             waitingText.text = "플레이어 대기 중...";
             yield return new WaitForSeconds(1);
         }
-
-        while (start)
+    }
+    private IEnumerator Countdown()
+    {
+        while (countDown > 0)
         {
-            waitingText.text = countDown.ToString();
-            if (countDown == 0)
-            {
-                PhotonNetwork.LoadLevel("InGame");
-                break;
-            }
+            photonView.RPC("RPCUpdateCountdown", RpcTarget.All, countDown);
             yield return new WaitForSeconds(1);
             countDown--;
         }
+
+        photonView.RPC("RPCLoadGameScene", RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void RPCUpdateCountdown(int remainingTime)
+    {
+        waitingText.text = remainingTime.ToString();
+    }
+    [PunRPC]
+    public void RPCLoadGameScene()
+    {
+        PhotonNetwork.LoadLevel("InGame");
     }
 }

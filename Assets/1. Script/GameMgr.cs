@@ -1,3 +1,4 @@
+using Cinemachine;
 using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,49 +28,41 @@ public class GameMgr : MonoBehaviourPunCallbacks
     public Zone[] zones;
     public int spawnPointIdx;
     public TMP_Text spawnCountText;
-    public float spawnCount;
-    public float maxSpawnCount;
-    bool gameStart;
+    int spawnCount;
+    public int maxSpawnCount;
+    public GameObject selectSpawnCanvas;
+    public SelectButton currentSelectButton;
+    public CinemachineVirtualCamera virtualCamera;
     private void Start()
     {
-        GameObject obj = PhotonNetwork.Instantiate("Character", Vector3.zero, Quaternion.identity);
-        photonView.RPC("RPCCountDown", RpcTarget.All);
-        character = obj.GetComponent<Character>();
-    }
-    
-
-    [PunRPC]
-    public void RPCCountDown()
-    {
-        StartCoroutine(CountDown());
+        GameObject characterObj = PhotonNetwork.Instantiate("Character", Vector3.zero, Quaternion.identity);
+        character = characterObj.GetComponent<Character>();
+        if (PhotonNetwork.IsMasterClient)
+            StartCoroutine(CountDown());
     }
 
     IEnumerator CountDown()
     {
         spawnCount = maxSpawnCount;
-        while (true)
+        while (spawnCount > 0)
         {
-            yield return null;
-            if (gameStart)
-            {
-                character.StartGame(spawnPoints[spawnPointIdx].transform.position);
-                break;
-            }
-                
-            if (spawnCount >= 0)
-            {
-                spawnCount -= Time.deltaTime;
-                spawnCountText.text = spawnCount.ToString("F0");
-            }
-            else
-            {
-                for(int i = 0; i < spawnPointIdx; i++)
-                {
-
-                }
-            }
+            photonView.RPC("RPCUpdateCountdown", RpcTarget.All, spawnCount);
+            yield return new WaitForSeconds(1);
+            spawnCount--;
         }
-
+        photonView.RPC("RPCStartGame", RpcTarget.All);
     }
-    
+    [PunRPC]
+    public void RPCStartGame()
+    {
+        selectSpawnCanvas.SetActive(false);
+        character.StartGame(spawnPoints[spawnPointIdx].transform.position);
+    }
+
+    [PunRPC]
+    public void RPCUpdateCountdown(int remainingTime)
+    {
+        spawnCountText.text = remainingTime.ToString();
+    }
+
 }

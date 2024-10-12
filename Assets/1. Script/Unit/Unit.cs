@@ -7,8 +7,9 @@ using UnityEngine.AI;
 using UnityEditor;
 using static UnityEngine.UI.CanvasScaler;
 using TMPro;
+using Photon.Pun;
 
-public class Unit : MonoBehaviour, Fighter
+public class Unit : MonoBehaviourPunCallbacks, Fighter
 {
     public UnitBehaviour[] unitBehaviours;
     public UnitBehaviour curUnitBehaviour;
@@ -84,6 +85,7 @@ public class Unit : MonoBehaviour, Fighter
 
     private void Awake()
     {
+        InitializeUnit();
         for (int i = 0; i < unitBehaviours.Length; i++)
         {
             unitBehaviours[i].InitUnit(this);
@@ -96,6 +98,18 @@ public class Unit : MonoBehaviour, Fighter
         agent = GetComponent<NavMeshAgent>();
         agent.speed = moveSpeed;
         
+    }
+
+    private void InitializeUnit()
+    {
+        unitBehaviours = GetComponentsInChildren<UnitBehaviour>();
+        curUnitBehaviour = GetUnitBehaviour(UnitBehaviourType.Wild);
+        attackTimer = maxAttackTimer;
+        catchBarImage.fillAmount = 0;
+        hpBarBg.gameObject.SetActive(false);
+        hp = maxHp;
+        EnterState(UnitState.Idle);
+        animator.SetBool("IsKnockDown", false);
     }
 
     public UnitBehaviour GetUnitBehaviour(UnitBehaviourType type)
@@ -126,18 +140,6 @@ public class Unit : MonoBehaviour, Fighter
             }
         }
         return null;
-    }
-
-    private void OnEnable()
-    {
-        unitBehaviours = GetComponentsInChildren<UnitBehaviour>();
-        curUnitBehaviour = GetUnitBehaviour(UnitBehaviourType.Wild);
-        attackTimer = maxAttackTimer;
-        catchBarImage.fillAmount = 0;
-        hpBarBg.gameObject.SetActive(false);
-        hp = maxHp;
-        EnterState(UnitState.Idle);
-        animator.SetBool("IsKnockDown", false);
     }
 
     public virtual void EnterState(UnitState state)
