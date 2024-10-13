@@ -44,7 +44,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     public List<FriendlyBtn> friendlyBtns = new List<FriendlyBtn>();
 
 
-    [Tooltip("작을 수록 빠르게 회전함")]
+    [Tooltip("???? ???? ?????? ??????")]
     [Range(0.0f, 0.3f)]
     public float RotationSmoothTime = 0.12f;
 
@@ -270,6 +270,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
                 photonView.RPC("RPCTriggerAttack", RpcTarget.All, attackAmount);
             }
         }
+
         ChecknearRegularUnit();
         if (Input.GetKeyDown(KeyCode.F))
         {
@@ -373,7 +374,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     [PunRPC]
     public void RPCTriggerAttack(int attackAmount)
     {
-        animator.SetTrigger("Attack" + attackAmount);
+        animator.Play("Attack" + attackAmount);
     }
 
     public void ChecknearRegularUnit()
@@ -600,7 +601,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     }
 
 
-    void SetInputDirection() //입력 방향 설정
+    void SetInputDirection() //???? ???? ????
     {
         if (Input.GetMouseButton(0))
             return;
@@ -613,7 +614,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
         if (inputDirection.magnitude > 0)
         {
-            //x,z,방향에 대한 벡터에 대한 카메라의 현재 수평 회전(y 축 회전)을 기준으로 하여 그 대상 방향으로 회전해야 할 각도(_targetRotation)
+            //x,z,?????? ???? ?????? ???? ???????? ???? ???? ????(y ?? ????)?? ???????? ???? ?? ???? ???????? ???????? ?? ????(_targetRotation)
             targetRotation = Mathf.Atan2(normalDirection.x, normalDirection.z) * Mathf.Rad2Deg + cameraPointTr.eulerAngles.y;
         }
         else
@@ -621,7 +622,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
             targetRotation = 0;
         }
 
-        //카메라를 기준으로 입력했을 때 나아가야될 방향을 설정하는 코드
+        //???????? ???????? ???????? ?? ?????????? ?????? ???????? ????
         Vector3 cameraDirection = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
         this.inputDirection = inputDirection;
         this.cameraDirection = cameraDirection;
