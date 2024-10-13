@@ -23,6 +23,8 @@ public class PhotonMgr : MonoBehaviourPunCallbacks
     }
     private void Awake()
     {
+        PhotonNetwork.SendRate = 30;
+        PhotonNetwork.SerializationRate = 15;
         instance = this;
         DontDestroyOnLoad(gameObject);
     }

@@ -3,6 +3,7 @@ using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -36,6 +37,8 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     public float maxHp;
     public Image hpBar;
     public Image hpBarSecondImage;
+    public Image outHpBar;
+    public Image outHpBarSecondImage;
 
     public FriendlyBtn friendlyBtnPrefab;
     public List<FriendlyBtn> friendlyBtns = new List<FriendlyBtn>();
@@ -82,6 +85,8 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     public Unit catchTarget;
 
     public GameObject canvas;
+    public GameObject outCanvas;
+    public TMP_Text nickNameText;
 
     float catchTimer;
     public float maxCatchTimer;
@@ -92,8 +97,11 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
     Unit currentUnit;
 
+    int myIndex;
+
     private void Awake()
     {
+        inventory = GetComponentInChildren<Inventory>();
         if (photonView.IsMine)
         {
             GameMgr.Instance.player = this;
@@ -102,7 +110,6 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         }
         
         animationEventHandler = bodyTr.GetComponent<AnimationEventHandler>();
-        inventory = GetComponentInChildren<Inventory>();
         animationEventHandler.startAttackListener += StartAttack;
         animationEventHandler.endAttackListener += EndAttack;
         animationEventHandler.finishAttackListener += FinishAttack;
@@ -121,9 +128,22 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         rb = GetComponent<Rigidbody>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
+        {
+            if (PhotonNetwork.PlayerList[i] == PhotonNetwork.LocalPlayer)
+            {
+                myIndex = i;
+                break;
+            }
+        }
+        nickNameText.text = PhotonNetwork.PlayerList[myIndex].NickName;
         if (!photonView.IsMine)
         {
             canvas.SetActive(false);
+        }
+        else
+        {
+            outCanvas.SetActive(false);
         }
     }
 
@@ -139,7 +159,8 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
     public void TakeDamage(float damage)
     {
-        photonView.RPC("RPCTakeDamage", RpcTarget.All, damage);
+        if (photonView.IsMine)
+            photonView.RPC("RPCTakeDamage", RpcTarget.All, damage);
     }
     [PunRPC]
     public void RPCTakeDamage(float damage)
@@ -147,7 +168,9 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         hp -= damage;
 
         hpBar.fillAmount = hp / maxHp;
+        outHpBar.fillAmount = hp / maxHp;
         StartCoroutine(CoSmoothHpBar(hpBar.fillAmount, 1));
+        StartCoroutine(CoSmoothOutHpBar(outHpBar.fillAmount, 1));
         if (hp <= 0)
         {
             animator.Play("Die");
@@ -167,6 +190,20 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         }
 
         hpBarSecondImage.fillAmount = targetFillAmount;
+    }
+    private IEnumerator CoSmoothOutHpBar(float targetFillAmount, float duration)
+    {
+        float elapsedTime = 0f;
+        float startFillAmount = outHpBarSecondImage.fillAmount;
+
+        while (elapsedTime < duration)
+        {
+            elapsedTime += Time.deltaTime;
+            outHpBarSecondImage.fillAmount = Mathf.Lerp(startFillAmount, targetFillAmount, elapsedTime / duration);
+            yield return null;
+        }
+
+        outHpBarSecondImage.fillAmount = targetFillAmount;
     }
     public void EndAttack()
     {
@@ -230,7 +267,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
                 noFinshAttack = true;
                 IsStop = true;
                 Debug.Log("Attack" + attackAmount);
-                animator.SetTrigger("Attack" + attackAmount);
+                photonView.RPC("RPCTriggerAttack", RpcTarget.All, attackAmount);
             }
         }
         ChecknearRegularUnit();
@@ -242,7 +279,8 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
             {
                 foreach (Collider col in cols)
                 {
-                    col.GetComponent<Item>().GetItem();
+                    if (photonView.IsMine)
+                        col.GetComponent<Item>().photonView.RPC("RPCGetItem", RpcTarget.All);
                     break;
                 }
             }
@@ -332,7 +370,11 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         }
     }
 
-    
+    [PunRPC]
+    public void RPCTriggerAttack(int attackAmount)
+    {
+        animator.SetTrigger("Attack" + attackAmount);
+    }
 
     public void ChecknearRegularUnit()
     {
@@ -506,7 +548,12 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
         rollTime = rollDuration;
         rollDirection = cameraDirection;
+        photonView.RPC("RPCTriggerRoll", RpcTarget.All);
+    }
 
+    [PunRPC]
+    public void RPCTriggerRoll()
+    {
         animator.SetTrigger("Roll");
     }
 

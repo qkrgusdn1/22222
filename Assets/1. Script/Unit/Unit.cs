@@ -214,6 +214,13 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
 
     public void TakeDamage(float damage)
     {
+        if (photonView.IsMine)
+            photonView.RPC("RPCTakeDamage", RpcTarget.All, damage);
+    }
+
+    [PunRPC]
+    public void RPCTakeDamage(float damage)
+    {
         hpBarBg.gameObject.SetActive(true);
         hp -= damage;
 
@@ -222,7 +229,7 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
             EnterState(UnitState.KnockDown);
         }
 
-        
+
         hpBar.fillAmount = hp / maxHp;
         StartCoroutine(CoSmoothHpBar(hpBar.fillAmount, 1));
         if (hp <= 0)

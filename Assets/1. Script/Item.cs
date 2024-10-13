@@ -1,8 +1,9 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Item : MonoBehaviour
+public class Item : MonoBehaviourPunCallbacks
 {
     public string key;
 
@@ -32,7 +33,8 @@ public class Item : MonoBehaviour
         float newY = Mathf.PingPong(Time.time * upDownSpeed, upDownDistance * 2);
         transform.position = new Vector3(initialPosition.x, initialPosition.y + newY, initialPosition.z);
     }
-    public void GetItem()
+    [PunRPC]
+    public void RPCGetItem()
     {
         if (itemType == ItemType.weapon)
         {
@@ -47,7 +49,7 @@ public class Item : MonoBehaviour
                 }
             }
         }
-        else if(itemType == ItemType.heal)
+        else if (itemType == ItemType.heal)
         {
 
         }

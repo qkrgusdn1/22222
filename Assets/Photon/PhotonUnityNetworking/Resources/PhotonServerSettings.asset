@@ -50,6 +50,11 @@ MonoBehaviour:
   - RPCMixSpawnPoints
   - RPCStartSpwan
   - RPCTakeDamage
+  - RPCGetItem
+  - RPCOnClickedSelectWeaponBtn
+  - RPCSetKey
+  - RPCTriggerAttack
+  - RPCTriggerRoll
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

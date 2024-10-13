@@ -46,7 +46,7 @@ public class ItemFrame : MonoBehaviour
         {
             weaponInventory.selectAtkDescription.text = "";
         }
-        weaponInventory.weaponKey = key;
+        weaponInventory.SetKey(key);
         weaponInventory.selectName.text = key;
         inventory.WeaponImageChange(weaponInventory.selectImage.sprite);
     }

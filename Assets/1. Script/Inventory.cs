@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -8,7 +9,7 @@ using UnityEngine.Rendering;
 using UnityEngine.U2D;
 using UnityEngine.UI;
 
-public class Inventory : MonoBehaviour
+public class Inventory : MonoBehaviourPunCallbacks
 {
     private void Awake()
     {
@@ -125,11 +126,39 @@ public class Inventory : MonoBehaviour
         this.weaponSprite = weaponSprite;
     }
 
+    public void SetKey(string key)
+    {
+        if (photonView.IsMine)
+            photonView.RPC("RPCSetKey", RpcTarget.All, key);
+    }
+    [PunRPC]
+    public void RPCSetKey(string key)
+    {
+        weaponKey = key;
+    }
+
     public void OnClickedSelectWeaponBtn()
+    {
+        if (photonView.IsMine)
+            photonView.RPC("RPCOnClickedSelectWeaponBtn", RpcTarget.All);
+        selectImage.gameObject.SetActive(false);
+        selectDescription.gameObject.SetActive(false);
+        for (int i = 0; i < buttons.Count; i++)
+        {
+            buttons[i].gameObject.SetActive(false);
+        }
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+        player.IsStop = false;
+        player.inventoryBg.SetActive(false);
+    }
+
+    [PunRPC]
+    public void RPCOnClickedSelectWeaponBtn()
     {
         foreach (Weapon weapon in weapones)
         {
-            if(weapon.key == weaponKey)
+            if (weapon.key == weaponKey)
             {
                 weapon.gameObject.SetActive(true);
                 currentWeapon = weapon;
@@ -142,16 +171,6 @@ public class Inventory : MonoBehaviour
                 currentWeapon = null;
             }
         }
-        selectImage.gameObject.SetActive(false);
-        selectDescription.gameObject.SetActive(false);
-        for (int i = 0; i < buttons.Count; i++)
-        {
-            buttons[i].gameObject.SetActive(false);
-        }
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
-        player.IsStop = false;
-        player.inventoryBg.SetActive(false);
     }
 }
 
