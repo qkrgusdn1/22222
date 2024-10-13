@@ -374,7 +374,8 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     [PunRPC]
     public void RPCTriggerAttack(int attackAmount)
     {
-        animator.Play("Attack" + attackAmount);
+        animator.CrossFade("Attack"+ attackAmount, 0.1f);
+        ///animator.Play("Attack" + attackAmount);
     }
 
     public void ChecknearRegularUnit()
