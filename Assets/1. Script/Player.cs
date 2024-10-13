@@ -280,8 +280,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
             {
                 foreach (Collider col in cols)
                 {
-                    if (photonView.IsMine)
-                        col.GetComponent<Item>().photonView.RPC("RPCGetItem", RpcTarget.All);
+                    col.GetComponent<Item>().GetItem();
                     break;
                 }
             }
@@ -375,7 +374,6 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     public void RPCTriggerAttack(int attackAmount)
     {
         animator.CrossFade("Attack"+ attackAmount, 0.1f);
-        ///animator.Play("Attack" + attackAmount);
     }
 
     public void ChecknearRegularUnit()
@@ -556,7 +554,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     [PunRPC]
     public void RPCTriggerRoll()
     {
-        animator.SetTrigger("Roll");
+        animator.CrossFade("Roll", 0.1f);
     }
 
     void Roll()
@@ -602,7 +600,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     }
 
 
-    void SetInputDirection() //???? ???? ????
+    void SetInputDirection()
     {
         if (Input.GetMouseButton(0))
             return;
@@ -614,8 +612,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         Vector3 normalDirection = new Vector3(x, 0.0f, z).normalized;
 
         if (inputDirection.magnitude > 0)
-        {
-            //x,z,?????? ???? ?????? ???? ???????? ???? ???? ????(y ?? ????)?? ???????? ???? ?? ???? ???????? ???????? ?? ????(_targetRotation)
+        { 
             targetRotation = Mathf.Atan2(normalDirection.x, normalDirection.z) * Mathf.Rad2Deg + cameraPointTr.eulerAngles.y;
         }
         else
@@ -623,7 +620,6 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
             targetRotation = 0;
         }
 
-        //???????? ???????? ???????? ?? ?????????? ?????? ???????? ????
         Vector3 cameraDirection = Quaternion.Euler(0.0f, targetRotation, 0.0f) * Vector3.forward;
         this.inputDirection = inputDirection;
         this.cameraDirection = cameraDirection;

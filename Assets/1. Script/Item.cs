@@ -33,8 +33,7 @@ public class Item : MonoBehaviourPunCallbacks
         float newY = Mathf.PingPong(Time.time * upDownSpeed, upDownDistance * 2);
         transform.position = new Vector3(initialPosition.x, initialPosition.y + newY, initialPosition.z);
     }
-    [PunRPC]
-    public void RPCGetItem()
+    public void GetItem()
     {
         if (itemType == ItemType.weapon)
         {
@@ -54,6 +53,12 @@ public class Item : MonoBehaviourPunCallbacks
 
         }
 
+        photonView.RPC("RPCGetItem", RpcTarget.All);
+    }
+    [PunRPC]
+    public void RPCGetItem()
+    {
+        
         Destroy(gameObject);
     }
 }
