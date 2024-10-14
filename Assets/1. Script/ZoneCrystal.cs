@@ -25,7 +25,7 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
     {
         Debug.Log("hitterViewID = " + hitterViewID);
         photonView.RPC("RPCTakeDamage", RpcTarget.All, damage, hitterViewID);
-        photonView.RPC("RPCHpZero", RpcTarget.All, hitterViewID);
+        
     }
     [PunRPC]
     public void RPCHpZero(int viewID)
@@ -74,6 +74,10 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
         smoothHpBar = StartCoroutine(CoSmoothHpBar(hpBar.fillAmount, 1));
         if (hp <= 0)
         {
+            if (PhotonNetwork.IsMasterClient)
+            {
+                photonView.RPC("RPCHpZero", RpcTarget.All, viewID);
+            }
             if (smoothHpBar != null)
             {
                 StopCoroutine(smoothHpBar);
