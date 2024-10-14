@@ -180,5 +180,6 @@ public enum RegularUnitState
     Guard,
     Defender,
     Follow,
-    KnockDown
+    KnockDown,
+    None
 }

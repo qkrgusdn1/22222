@@ -3555,7 +3555,7 @@ MonoBehaviour:
   zoneDistanceToPlayer: 0
   player: {fileID: 0}
   targetting: 0
-  regularUnitState: 0
+  regularUnitState: 4
   stopRange: 3
   regularStateName: 
 --- !u!114 &4014763284193105864
@@ -5015,21 +5015,9 @@ MonoBehaviour:
   - Type: 4
     SynchronizeType: 2
     Name: IsRunning
-  - Type: 9
-    SynchronizeType: 2
-    Name: Attack0
-  - Type: 9
-    SynchronizeType: 2
-    Name: Roll
   - Type: 4
     SynchronizeType: 2
     Name: IsKnockDown
-  - Type: 9
-    SynchronizeType: 2
-    Name: Attack1
-  - Type: 9
-    SynchronizeType: 2
-    Name: Attack2
   m_SynchronizeLayers:
   - SynchronizeType: 2
     LayerIndex: 0
