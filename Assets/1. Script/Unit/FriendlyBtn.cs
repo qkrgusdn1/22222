@@ -17,7 +17,7 @@ public class FriendlyBtn : MonoBehaviour
 
 
     bool set;
-    Unit unit;
+    public Unit unit;
     bool mine;
 
     private void Start()
@@ -79,6 +79,8 @@ public class FriendlyBtn : MonoBehaviour
                 player.friendlyBtns[i].mine = false;
             }
         }
+
+
 
 
     }

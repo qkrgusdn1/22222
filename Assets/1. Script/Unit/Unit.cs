@@ -238,7 +238,18 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
             animator.Play("Die");
         }
     }
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(hp);
+        }
+        else
+        {
+            hp = (float)stream.ReceiveNext();
 
+        }
+    }
 }
 
 public enum UnitState

@@ -30,6 +30,9 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     AnimationEventHandler animationEventHandler;
     Inventory inventory;
 
+    Coroutine smoothHpBar;
+    Coroutine smoothOutHpBar;
+
     public Collider mainCollider;
     public Collider rollCollider;
 
@@ -44,7 +47,6 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     public List<FriendlyBtn> friendlyBtns = new List<FriendlyBtn>();
 
 
-    [Tooltip("???? ???? ?????? ??????")]
     [Range(0.0f, 0.3f)]
     public float RotationSmoothTime = 0.12f;
 
@@ -169,8 +171,19 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
         hpBar.fillAmount = hp / maxHp;
         outHpBar.fillAmount = hp / maxHp;
-        StartCoroutine(CoSmoothHpBar(hpBar.fillAmount, 1));
-        StartCoroutine(CoSmoothOutHpBar(outHpBar.fillAmount, 1));
+        if (smoothHpBar != null)
+        {
+            StopCoroutine(smoothHpBar);
+            smoothHpBar = null;
+        }
+        if (smoothOutHpBar != null)
+        {
+            StopCoroutine(smoothOutHpBar);
+            smoothOutHpBar = null;
+        }
+        smoothHpBar = StartCoroutine(CoSmoothHpBar(hpBar.fillAmount, 1));
+        smoothOutHpBar = StartCoroutine(CoSmoothOutHpBar(outHpBar.fillAmount, 1));
+       
         if (hp <= 0)
         {
             animator.Play("Die");
@@ -260,7 +273,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
             rb.velocity = new Vector3(0, rb.velocity.y, 0);
         }
 
-        if (Input.GetMouseButtonDown(0) && !isRoll && !IsStop)
+        if (Input.GetMouseButtonDown(0) && !isRoll && !IsStop && !isJumping)
         {
             if (inventory.currentWeapon != null && !noFinshAttack)
             {
@@ -363,11 +376,18 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
 
 
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isJumping && !isRoll)
+        if (Input.GetKeyDown(KeyCode.Space) && isGrounded && !isJumping && !isRoll && !noFinshAttack)
         {
             isJumping = true;
-            rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
+            photonView.RPC("RPCJump", RpcTarget.All);
         }
+    }
+
+    [PunRPC]
+    public void RPCJump()
+    {
+        animator.CrossFade("Jump", 0.1f);
+        rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
     }
 
     [PunRPC]

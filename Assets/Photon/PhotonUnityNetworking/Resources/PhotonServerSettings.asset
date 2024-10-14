@@ -55,6 +55,13 @@ MonoBehaviour:
   - RPCSetKey
   - RPCTriggerAttack
   - RPCTriggerRoll
+  - RPCJump
+  - RPCHpZero
+  - RPCSpawnUnits
+  - RPCSpawnUnit
+  - RPCSpwanUnit
+  - RPCUnitPositions
+  - ChangeUnitTypeRPC
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

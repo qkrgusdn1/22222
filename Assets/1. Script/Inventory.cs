@@ -61,6 +61,10 @@ public class Inventory : MonoBehaviourPunCallbacks
     public ChangeStateBtn[] changeStateBtns;
     public TMP_Text stateText;
 
+    public GameObject mergeBtn;
+    List<FriendlyBtn> friendlyBtns = new List<FriendlyBtn>();
+    public GameObject mergePanel;
+    public TMP_Text mergeText;
 
     private void Start()
     {
@@ -91,6 +95,44 @@ public class Inventory : MonoBehaviourPunCallbacks
             friendlyMenu.gameObject.SetActive(true);
             menuText.text = "아군";
         }
+
+       
+    }
+
+    public void ClickedSelectBtn(string unitName)
+    {
+        int count = 0;
+
+        for (int i = 0; i < player.friendlyBtns.Count; i++)
+        {
+            if (player.friendlyBtns[i].unitName == unitName && count < 3 && player.friendlyBtns[i].unit.unitType != UnitType.threeStar)
+            {
+                count++;
+                friendlyBtns.Add(player.friendlyBtns[i]);
+                continue;
+            }
+            break;
+        }
+        mergeBtn.SetActive(count >= 3);
+    }
+
+    public void OnClickedMergeBtn()
+    {
+        for(int i = 0; i < friendlyBtns.Count; i++)
+        {
+            Destroy(friendlyBtns[i].unit);
+            Destroy(friendlyBtns[i]);
+        }
+        StartCoroutine(CoMergePanelActive());
+        mergeText.text = Random.value < 0.5f ? "강화 성공" : "강화 실패";
+        friendlyBtns.Clear();
+    }
+
+    IEnumerator CoMergePanelActive()
+    {
+        mergePanel.SetActive(true);
+        yield return new WaitForSeconds(2);
+        mergePanel.SetActive(false);
     }
 
     public void AddItem(string key, Sprite sprite, string description, string atkatkDescription)
@@ -99,7 +141,6 @@ public class Inventory : MonoBehaviourPunCallbacks
         {
             items.Add(key, new InventoryItem(key, sprite, description, atkatkDescription));
         }
-
         items[key].count++;
 
         UpdateUI();

@@ -20,6 +20,7 @@ public abstract class UnitBehaviour : MonoBehaviour
     {
         if (unitState == UnitState.Idle)
         {
+            unit.animator.SetBool("IsKnockDown", false);
             unit.agent.isStopped = true;
             unit.agent.velocity = new Vector3(0, unit.rb.velocity.y, 0);
             unit.rb.velocity = new Vector3(0, unit.rb.velocity.y, 0);
