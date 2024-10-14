@@ -162,7 +162,7 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
     public void Attack(Fighter target, float damage)
     {
         if (target != null)
-            target.TakeDamage(damage);
+            target.TakeDamage(damage, photonView.ViewID);
     }
     public void AttackStart()
     {
@@ -212,7 +212,7 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
 
 
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, int hitterID)
     {
         if (photonView.IsMine)
             photonView.RPC("RPCTakeDamage", RpcTarget.All, damage);

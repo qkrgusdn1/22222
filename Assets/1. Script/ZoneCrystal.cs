@@ -21,23 +21,21 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
         zone = GetComponentInParent<Zone>();
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, int hitterViewID)
     {
-        if (photonView.IsMine)
-        {
-            photonView.RPC("RPCTakeDamage", RpcTarget.All, damage);
-            photonView.RPC("RPCHpZero", RpcTarget.All, PhotonNetwork.LocalPlayer.ActorNumber);
-        }
+        Debug.Log("hitterViewID = " + hitterViewID);
+        photonView.RPC("RPCTakeDamage", RpcTarget.All, damage, hitterViewID);
+        photonView.RPC("RPCHpZero", RpcTarget.All, hitterViewID);
     }
     [PunRPC]
-    public void RPCHpZero(int selectingPlayerId)
+    public void RPCHpZero(int viewID)
     {
-        if (hp > 0)
-            return;
+        Player player = PhotonNetwork.GetPhotonView(viewID).GetComponent<Player>();
+        
         hp = maxHp;
         hpBar.fillAmount = 1;
         hpBarSecondImage.fillAmount = 1;
-        if (selectingPlayerId != PhotonNetwork.LocalPlayer.ActorNumber)
+        if (GameMgr.Instance.player != player)
         {
             for (int i = 0; i < zone.units.Count; i++)
             {
@@ -55,30 +53,16 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
             {
                 if(zone.units[i] != null)
                 {
+                    player.Catch(zone.units[i]);
                     gameObject.layer = LayerMask.NameToLayer("Friendly");
                     hpBar.color = Color.green;
-                    zone.units[i].curUnitBehaviour = zone.units[i].GetUnitBehaviour(UnitBehaviourType.Reguler);
-                    zone.units[i].curUnitBehaviour.GetComponent<UnitBehaviour>().PlayerSetting(GameMgr.Instance.player);
-                    zone.units[i].hpBar.color = Color.green;
-                    zone.units[i].hp = zone.units[i].maxHp;
-                    zone.units[i].catchBarBgImage.SetActive(false);
-                    zone.units[i].hpBar.fillAmount = 1;
-                    zone.units[i].EnterState(UnitState.Idle);
-                    zone.units[i].animator.SetBool("IsKnockDown", false);
-                    zone.units[i].agent.isStopped = false;
-                    FriendlyBtn friendlyBtn = Instantiate(GameMgr.Instance.player.friendlyBtnPrefab, GameMgr.Instance.inventory.friendlyBtnGroup.transform);
-                    GameMgr.Instance.player.friendlyBtns.Add(friendlyBtn);
-                    friendlyBtn.SetFriendlyBtn(GameMgr.Instance.inventory, zone.units[i]);
-                    zone.units[i].unitState = UnitState.Idle;
-                    zone.units[i].zoneUnit = false;
-                    zone.units[i].GetComponent<RegularUnitBehaviour>().regularUnitState = RegularUnitState.Defender;
                 }
             }
         }
     }
 
     [PunRPC]
-    public void RPCTakeDamage(float damage)
+    public void RPCTakeDamage(float damage, int viewID)
     {
         hp -= damage;
         hpBar.fillAmount = hp / maxHp;

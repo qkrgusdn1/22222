@@ -1,5 +1,4 @@
 using Photon.Pun;
-using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -110,7 +109,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
             GameMgr.Instance.virtualCamera.Follow = cameraPoint;
             GameMgr.Instance.inventory = inventory;
         }
-        
+
         animationEventHandler = bodyTr.GetComponent<AnimationEventHandler>();
         animationEventHandler.startAttackListener += StartAttack;
         animationEventHandler.endAttackListener += EndAttack;
@@ -119,7 +118,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         animationEventHandler.endRollListener += EndRoll;
         mainCollider.enabled = true;
         rollCollider.enabled = false;
-        
+
     }
     private void Start()
     {
@@ -151,16 +150,20 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
     public void Attack(Fighter target, float damage)
     {
+        if (!photonView.IsMine)
+            return;
+
         if (target != null)
-            target.TakeDamage(damage);
+            target.TakeDamage(damage, photonView.ViewID);
     }
     public void StartAttack()
     {
         inventory.currentWeapon.StartAttack();
     }
 
-    public void TakeDamage(float damage)
+    public void TakeDamage(float damage, int hitterID)
     {
+
         if (photonView.IsMine)
             photonView.RPC("RPCTakeDamage", RpcTarget.All, damage);
     }
@@ -183,7 +186,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         }
         smoothHpBar = StartCoroutine(CoSmoothHpBar(hpBar.fillAmount, 1));
         smoothOutHpBar = StartCoroutine(CoSmoothOutHpBar(outHpBar.fillAmount, 1));
-       
+
         if (hp <= 0)
         {
             animator.Play("Die");
@@ -298,7 +301,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
                 }
             }
             Debug.Log(cols.Length);
-            
+
         }
         if (Input.GetKey(KeyCode.F))
         {
@@ -393,7 +396,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     [PunRPC]
     public void RPCTriggerAttack(int attackAmount)
     {
-        animator.CrossFade("Attack"+ attackAmount, 0.1f);
+        animator.CrossFade("Attack" + attackAmount, 0.1f);
     }
 
     public void ChecknearRegularUnit()
@@ -437,11 +440,11 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
             currentUnit = null;
             return;
         }
-            
 
-        
+
+
         if (currentUnit != null)
-                currentUnit.curUnitBehaviour.UpdateFKeyImage(false);    
+            currentUnit.curUnitBehaviour.UpdateFKeyImage(false);
         currentUnit = cols[targetIdx].GetComponent<Unit>();
         currentUnit.curUnitBehaviour.UpdateFKeyImage(true);
 
@@ -472,7 +475,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
 
     }
-    
+
     public void OnRegularUnitState()
     {
         activeStateBg = true;
@@ -489,7 +492,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
     }
 
-    void Catch(Unit unit)
+    public void Catch(Unit unit)
     {
         friendlyUnits.Add(unit);
         unit.curUnitBehaviour = unit.GetUnitBehaviour(UnitBehaviourType.Reguler);
@@ -632,7 +635,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         Vector3 normalDirection = new Vector3(x, 0.0f, z).normalized;
 
         if (inputDirection.magnitude > 0)
-        { 
+        {
             targetRotation = Mathf.Atan2(normalDirection.x, normalDirection.z) * Mathf.Rad2Deg + cameraPointTr.eulerAngles.y;
         }
         else
