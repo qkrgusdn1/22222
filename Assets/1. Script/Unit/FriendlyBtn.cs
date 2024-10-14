@@ -80,7 +80,7 @@ public class FriendlyBtn : MonoBehaviour
             }
         }
 
-
+        inventory.ClickedSelectBtn(unitName);
 
 
     }

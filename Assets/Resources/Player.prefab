@@ -2630,6 +2630,8 @@ MonoBehaviour:
   - {fileID: 6147867914499968692}
   stateText: {fileID: 1640490920361070393}
   mergeBtn: {fileID: 6299989655639614421}
+  mergePanel: {fileID: 0}
+  mergeText: {fileID: 0}
 --- !u!114 &6261572465160958361
 MonoBehaviour:
   m_ObjectHideFlags: 0

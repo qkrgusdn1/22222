@@ -124,7 +124,14 @@ public class Inventory : MonoBehaviourPunCallbacks
             Destroy(friendlyBtns[i]);
         }
         StartCoroutine(CoMergePanelActive());
-        mergeText.text = Random.value < 0.5f ? "강화 성공" : "강화 실패";
+        if (Random.value < 0.5f)
+        {
+            mergeText.text = "강화 성공";
+        }
+        else
+        {
+            mergeText.text = "강화 실패";
+        }
         friendlyBtns.Clear();
     }
 
