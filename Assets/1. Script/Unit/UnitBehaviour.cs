@@ -1,21 +1,24 @@
+using Photon.Pun;
+using System;
 using UnityEngine;
 
-public abstract class UnitBehaviour : MonoBehaviour
+public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
 {
     public Unit unit;
     public UnitBehaviourType unitBehaviourType;
     public float distanceToPlayer;
     public float zoneDistanceToPlayer;
     public Player player;
-    public bool targetting;
+    public bool targetting; 
+    private void Awake()
+    {
+        unit = GetComponentInParent<Unit>();
+    }
     public void PlayerSetting(Player player)
     {
         this.player = player;
     }
-    public virtual void InitUnit(Unit unit)
-    {
-        this.unit = unit;
-    }
+
     public virtual void EnterState(UnitState unitState)
     {
         if (unitState == UnitState.Idle)
@@ -82,11 +85,23 @@ public abstract class UnitBehaviour : MonoBehaviour
 
             if (closestTarget != null)
             {
-                unit.target = closestTarget;
-                unit.EnterState(UnitState.Approach);
-                return;
+                PhotonView targetPhotonView = closestTarget.GetComponent<PhotonView>();
+                if (targetPhotonView != null)
+                {
+                    int targetViewID = targetPhotonView.ViewID;
+                    photonView.RPC("RPCSetTarget", RpcTarget.All, targetViewID);
+                    unit.EnterState(UnitState.Approach);
+                    return;
+                }
             }
         }
+    }
+
+    [PunRPC]
+    public void RPCSetTarget(int targetID)
+    {
+        GameObject target = PhotonView.Find(targetID).gameObject;
+        unit.target = target;
     }
 
     public virtual void UpdateApproachState()
@@ -110,7 +125,7 @@ public abstract class UnitBehaviour : MonoBehaviour
         Move(unit.target.gameObject);
         
     }
-
+   
     public void Move(GameObject target)
     {
         Debug.Log(target);
@@ -130,7 +145,9 @@ public abstract class UnitBehaviour : MonoBehaviour
         Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
         if (cols.Length > 0)
         {
-            unit.target = cols[0].gameObject;
+            PhotonView targetPhotonView = cols[0].GetComponent<PhotonView>();
+            int targetViewID = targetPhotonView.ViewID;
+            photonView.RPC("RPCSetTarget", RpcTarget.All, targetViewID);
             distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
         }
         if (Vector3.Distance(transform.position, unit.turnPoint.position) > 0.5f)

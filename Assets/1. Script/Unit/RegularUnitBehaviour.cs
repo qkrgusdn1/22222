@@ -1,3 +1,4 @@
+using Photon.Pun;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -54,12 +55,17 @@ public class RegularUnitBehaviour : UnitBehaviour
 
     public void OnClickedChangeRegularUnitStateBtn(string regularStateBtnName)
     {
+        photonView.RPC("RPCOnClickedChangeRegularUnitStateBtn", RpcTarget.All, regularStateBtnName);
+    }
+    [PunRPC]
+    public void RPCOnClickedChangeRegularUnitStateBtn(string regularStateBtnName)
+    {
         if (regularUnitState == RegularUnitState.KnockDown)
         {
             regularStateName = "기절";
             return;
         }
-            
+
         if (Enum.TryParse(regularStateBtnName, out RegularUnitState state))
         {
             regularUnitState = state;
@@ -69,12 +75,12 @@ public class RegularUnitBehaviour : UnitBehaviour
             unit.EnterState(UnitState.Approach);
             regularStateName = "따라오기";
         }
-        else if(regularUnitState == RegularUnitState.Guard)
+        else if (regularUnitState == RegularUnitState.Guard)
         {
             unit.EnterState(UnitState.Approach);
             regularStateName = "경호";
         }
-        else if(regularUnitState == RegularUnitState.Defender)
+        else if (regularUnitState == RegularUnitState.Defender)
         {
             unit.EnterState(UnitState.Idle);
             unit.turnPointObj.transform.position = transform.position;

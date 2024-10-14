@@ -140,10 +140,12 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         nickNameText.text = PhotonNetwork.PlayerList[myIndex].NickName;
         if (!photonView.IsMine)
         {
+            gameObject.layer = LayerMask.NameToLayer("Enemy");
             canvas.SetActive(false);
         }
         else
         {
+            gameObject.layer = LayerMask.NameToLayer("Friendly");
             outCanvas.SetActive(false);
         }
     }
@@ -163,9 +165,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
     public void TakeDamage(float damage, int hitterID)
     {
-
-        if (photonView.IsMine)
-            photonView.RPC("RPCTakeDamage", RpcTarget.All, damage);
+        photonView.RPC("RPCTakeDamage", RpcTarget.All, damage);
     }
     [PunRPC]
     public void RPCTakeDamage(float damage)
@@ -283,7 +283,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
                 noFinshAttack = true;
                 IsStop = true;
                 Debug.Log("Attack" + attackAmount);
-                photonView.RPC("RPCTriggerAttack", RpcTarget.All, attackAmount);
+                photonView.RPC("RPCCrossFadeAttack", RpcTarget.All, attackAmount);
             }
         }
 
@@ -394,7 +394,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     }
 
     [PunRPC]
-    public void RPCTriggerAttack(int attackAmount)
+    public void RPCCrossFadeAttack(int attackAmount)
     {
         animator.CrossFade("Attack" + attackAmount, 0.1f);
     }
@@ -494,23 +494,39 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
     public void Catch(Unit unit)
     {
+        photonView.RPC("RPCCatch", RpcTarget.All, unit.photonView.ViewID);
+    }
+
+    [PunRPC]
+    public void RPCCatch(int unitViewID)
+    {
+        Unit unit = PhotonView.Find(unitViewID).GetComponent<Unit>();
         friendlyUnits.Add(unit);
-        unit.curUnitBehaviour = unit.GetUnitBehaviour(UnitBehaviourType.Reguler);
-        unit.curUnitBehaviour.GetComponent<UnitBehaviour>().PlayerSetting(this);
-        unit.hpBar.color = Color.green;
         unit.hp = unit.maxHp;
         unit.catchBarBgImage.SetActive(false);
         unit.hpBar.fillAmount = 1;
         unit.EnterState(UnitState.Idle);
         unit.animator.SetBool("IsKnockDown", false);
         unit.agent.isStopped = false;
-        FriendlyBtn friendlyBtn = Instantiate(friendlyBtnPrefab, inventory.friendlyBtnGroup.transform);
-        friendlyBtns.Add(friendlyBtn);
-        friendlyBtn.SetFriendlyBtn(inventory, unit);
-        unit.unitState = UnitState.Idle;
-        unit.zoneUnit = false;
-        unit.GetComponent<RegularUnitBehaviour>().regularUnitState = RegularUnitState.Defender;
+        if (photonView.IsMine)
+        {
+            unit.curUnitBehaviour = unit.GetUnitBehaviour(UnitBehaviourType.Reguler);
+            unit.curUnitBehaviour.GetComponent<UnitBehaviour>().PlayerSetting(this);
+            unit.hpBar.color = Color.green;
+            FriendlyBtn friendlyBtn = Instantiate(friendlyBtnPrefab, inventory.friendlyBtnGroup.transform);
+            friendlyBtns.Add(friendlyBtn);
+            friendlyBtn.SetFriendlyBtn(inventory, unit);
+            unit.zoneUnit = false;
+            unit.GetComponent<RegularUnitBehaviour>().regularUnitState = RegularUnitState.Defender;
+        }
+        else
+        {
+
+        }
+       
+        
         catchTarget = null;
+        
     }
 
     private void OnCollisionStay(Collision collision)

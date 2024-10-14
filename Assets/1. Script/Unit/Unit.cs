@@ -8,6 +8,7 @@ using UnityEditor;
 using static UnityEngine.UI.CanvasScaler;
 using TMPro;
 using Photon.Pun;
+using System;
 
 public class Unit : MonoBehaviourPunCallbacks, Fighter
 {
@@ -86,10 +87,6 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
     private void Awake()
     {
         InitializeUnit();
-        for (int i = 0; i < unitBehaviours.Length; i++)
-        {
-            unitBehaviours[i].InitUnit(this);
-        }
         animationEventHandler.finishAttackListener += FinishAttack;
         animationEventHandler.startAttackListener += StartAttack;
         animationEventHandler.endAttackListener += EndAttack;
@@ -144,19 +141,29 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
 
     public virtual void EnterState(UnitState state)
     {
-        
-        if (unitState == state)
-            return;
-        
-        unitState = state;
-        curUnitBehaviour.EnterState(state);
-        if(state == UnitState.Idle)
+        string stateName = state.ToString();
+        photonView.RPC("RPCEnterState", RpcTarget.All, stateName);
+    }
+    [PunRPC]
+    public void RPCEnterState(string stateName)
+    {
+        if (Enum.TryParse(stateName, out UnitState state))
         {
-            target = null;
-        }
-        if(state == UnitState.Attack)
-        {
-            AttackStart();
+            if (unitState == state)
+                return;
+
+            unitState = state;
+            curUnitBehaviour.EnterState(state);
+
+            if (state == UnitState.Idle)
+            {
+                target = null;
+            }
+
+            if (state == UnitState.Attack)
+            {
+                AttackStart();
+            }
         }
     }
     public void Attack(Fighter target, float damage)
@@ -168,7 +175,12 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
     {
         animator.SetBool("IsRunning", false);
         attackTimer = maxAttackTimer;
-        animator.Play("Attack" + attackAmount);
+        photonView.RPC("RPCCrossFadeAttack", RpcTarget.All, attackAmount);
+    }
+    [PunRPC]
+    public void RPCCrossFadeAttack(int attackAmount)
+    {
+        animator.CrossFade("Attack" + attackAmount, 0.1f);
     }
 
     public void StartAttack()
@@ -214,8 +226,7 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
 
     public void TakeDamage(float damage, int hitterID)
     {
-        if (photonView.IsMine)
-            photonView.RPC("RPCTakeDamage", RpcTarget.All, damage);
+        photonView.RPC("RPCTakeDamage", RpcTarget.All, damage);
     }
 
     [PunRPC]
