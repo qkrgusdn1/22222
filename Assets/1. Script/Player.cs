@@ -140,13 +140,14 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         nickNameText.text = PhotonNetwork.PlayerList[myIndex].NickName;
         if (!photonView.IsMine)
         {
-            gameObject.layer = LayerMask.NameToLayer("Enemy");
             canvas.SetActive(false);
+            gameObject.layer = LayerMask.NameToLayer("Enemy");
+            
         }
         else
         {
-            gameObject.layer = LayerMask.NameToLayer("Friendly");
             outCanvas.SetActive(false);
+            gameObject.layer = LayerMask.NameToLayer("Friendly");
         }
     }
 
