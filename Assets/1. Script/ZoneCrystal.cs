@@ -25,7 +25,6 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
     {
         Debug.Log("hitterViewID = " + hitterViewID);
         photonView.RPC("RPCTakeDamage", RpcTarget.All, damage, hitterViewID);
-        
     }
     [PunRPC]
     public void RPCHpZero(int viewID)

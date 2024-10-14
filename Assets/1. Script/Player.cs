@@ -498,7 +498,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         unit.curUnitBehaviour = unit.GetUnitBehaviour(UnitBehaviourType.Reguler);
         unit.curUnitBehaviour.GetComponent<UnitBehaviour>().PlayerSetting(this);
         unit.hpBar.color = Color.green;
-        unit.hp = catchTarget.maxHp;
+        unit.hp = unit.maxHp;
         unit.catchBarBgImage.SetActive(false);
         unit.hpBar.fillAmount = 1;
         unit.EnterState(UnitState.Idle);
