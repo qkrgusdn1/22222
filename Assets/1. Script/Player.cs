@@ -503,26 +503,13 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     {
         Unit unit = PhotonView.Find(unitViewID).GetComponent<Unit>();
         friendlyUnits.Add(unit);
-        unit.hp = unit.maxHp;
-        unit.catchBarBgImage.SetActive(false);
-        unit.hpBar.fillAmount = 1;
-        unit.EnterState(UnitState.Idle);
-        unit.animator.SetBool("IsKnockDown", false);
-        unit.agent.isStopped = false;
+        unit.Catched(this);
+        
         if (photonView.IsMine)
         {
-            unit.curUnitBehaviour = unit.GetUnitBehaviour(UnitBehaviourType.Reguler);
-            unit.curUnitBehaviour.GetComponent<UnitBehaviour>().PlayerSetting(this);
-            unit.hpBar.color = Color.green;
             FriendlyBtn friendlyBtn = Instantiate(friendlyBtnPrefab, inventory.friendlyBtnGroup.transform);
             friendlyBtns.Add(friendlyBtn);
             friendlyBtn.SetFriendlyBtn(inventory, unit);
-            unit.zoneUnit = false;
-            unit.GetComponent<RegularUnitBehaviour>().regularUnitState = RegularUnitState.Defender;
-        }
-        else
-        {
-
         }
        
         

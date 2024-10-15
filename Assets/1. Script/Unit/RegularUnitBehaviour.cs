@@ -16,8 +16,8 @@ public class RegularUnitBehaviour : UnitBehaviour
 
     private void Start()
     {
-        regularStateName = "사수";
-        unit.regularStateText.text = "현재 아군 상태 : " + regularStateName;
+        regularStateName = "????";
+        unit.regularStateText.text = "???? ???? ???? : " + regularStateName;
     }
 
     private void OnDrawGizmosSelected()
@@ -53,6 +53,7 @@ public class RegularUnitBehaviour : UnitBehaviour
         }
     }
 
+    //?? ????? ?? ???? ???? ??? ?? ???? ??
     public void OnClickedChangeRegularUnitStateBtn(string regularStateBtnName)
     {
         photonView.RPC("RPCOnClickedChangeRegularUnitStateBtn", RpcTarget.All, regularStateBtnName);
@@ -62,7 +63,7 @@ public class RegularUnitBehaviour : UnitBehaviour
     {
         if (regularUnitState == RegularUnitState.KnockDown)
         {
-            regularStateName = "기절";
+            regularStateName = "????";
             return;
         }
 
@@ -73,12 +74,12 @@ public class RegularUnitBehaviour : UnitBehaviour
         if (regularUnitState == RegularUnitState.Follow)
         {
             unit.EnterState(UnitState.Approach);
-            regularStateName = "따라오기";
+            regularStateName = "????????";
         }
         else if (regularUnitState == RegularUnitState.Guard)
         {
             unit.EnterState(UnitState.Approach);
-            regularStateName = "경호";
+            regularStateName = "????";
         }
         else if (regularUnitState == RegularUnitState.Defender)
         {
@@ -86,10 +87,10 @@ public class RegularUnitBehaviour : UnitBehaviour
             unit.turnPointObj.transform.position = transform.position;
             unit.turnPoint = unit.turnPointObj.transform;
 
-            regularStateName = "사수";
+            regularStateName = "????";
         }
 
-        unit.regularStateText.text = "현재 아군 상태 : " + regularStateName;
+        unit.regularStateText.text = "???? ???? ???? : " + regularStateName;
     }
 
     public override void UpdateAttackState()
