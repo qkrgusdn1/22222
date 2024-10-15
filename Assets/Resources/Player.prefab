@@ -6771,7 +6771,7 @@ MonoBehaviour:
   friendlyBtns: []
   RotationSmoothTime: 0.12
   controlPower: 0
-  maxJumpForce: 9.5
+  maxJumpForce: 9.8
   isGrounded: 0
   groundLayer:
     serializedVersion: 2

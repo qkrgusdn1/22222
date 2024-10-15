@@ -16,8 +16,8 @@ public class RegularUnitBehaviour : UnitBehaviour
 
     private void Start()
     {
-        regularStateName = "????";
-        unit.regularStateText.text = "???? ???? ???? : " + regularStateName;
+        regularStateName = "사수";
+        unit.regularStateText.text = "현재 유닛 상태 " + regularStateName;
     }
 
     private void OnDrawGizmosSelected()
@@ -63,7 +63,7 @@ public class RegularUnitBehaviour : UnitBehaviour
     {
         if (regularUnitState == RegularUnitState.KnockDown)
         {
-            regularStateName = "????";
+            regularStateName = "기절";
             return;
         }
 
@@ -74,12 +74,12 @@ public class RegularUnitBehaviour : UnitBehaviour
         if (regularUnitState == RegularUnitState.Follow)
         {
             unit.EnterState(UnitState.Approach);
-            regularStateName = "????????";
+            regularStateName = "따라오기";
         }
         else if (regularUnitState == RegularUnitState.Guard)
         {
             unit.EnterState(UnitState.Approach);
-            regularStateName = "????";
+            regularStateName = "경호";
         }
         else if (regularUnitState == RegularUnitState.Defender)
         {
@@ -87,10 +87,10 @@ public class RegularUnitBehaviour : UnitBehaviour
             unit.turnPointObj.transform.position = transform.position;
             unit.turnPoint = unit.turnPointObj.transform;
 
-            regularStateName = "????";
+            regularStateName = "사수";
         }
 
-        unit.regularStateText.text = "???? ???? ???? : " + regularStateName;
+        unit.regularStateText.text = "현재 유닛 상태 : " + regularStateName;
     }
 
     public override void UpdateAttackState()

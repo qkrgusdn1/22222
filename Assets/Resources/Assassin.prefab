@@ -2729,6 +2729,7 @@ MonoBehaviour:
   zoneDistanceToPlayer: 0
   player: {fileID: 0}
   targetting: 0
+  targetPhotonView: {fileID: 0}
 --- !u!114 &255610727070813447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3555,6 +3556,7 @@ MonoBehaviour:
   zoneDistanceToPlayer: 0
   player: {fileID: 0}
   targetting: 0
+  targetPhotonView: {fileID: 0}
   regularUnitState: 4
   stopRange: 3
   regularStateName: 

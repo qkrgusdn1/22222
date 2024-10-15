@@ -64,7 +64,7 @@ public class FriendlyBtn : MonoBehaviour
         for (int i = 0; i < inventory.changeStateBtns.Length; i++)
         {
             inventory.changeStateBtns[i].unit = unit;
-            inventory.changeStateBtns[i].ChangeState(unit.GetComponent<RegularUnitBehaviour>());
+            inventory.changeStateBtns[i].ChangeState(unit.GetComponentInChildren<RegularUnitBehaviour>());
             inventory.changeStateBtns[i].stateText = inventory.stateText;
         }
         mine = true;

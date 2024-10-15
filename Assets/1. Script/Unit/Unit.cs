@@ -74,6 +74,7 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
     public GameObject turnPointObj;
     public GameObject turnPointPrefab;
 
+    Player ownerPlayer;
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
@@ -261,10 +262,6 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
 
         }
     }
-
-
-    //
-    Player ownerPlayer;//이 변수로 플레이어 누군지 구분 가
     public void Catched(Player player)
     {
         ownerPlayer = player;
@@ -277,7 +274,6 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
 
         if (player.photonView.IsMine)
         {
-
             curUnitBehaviour = GetUnitBehaviour(UnitBehaviourType.Reguler);
             curUnitBehaviour.GetComponent<UnitBehaviour>().PlayerSetting(player);
             hpBar.color = Color.green;
@@ -285,7 +281,6 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
             zoneUnit = false;
             RegularUnitBehaviour regularUnitBehaviour = (RegularUnitBehaviour)curUnitBehaviour;
             regularUnitBehaviour.OnClickedChangeRegularUnitStateBtn(RegularUnitState.Defender.ToString());
-            //GetComponent<RegularUnitBehaviour>().regularUnitState = RegularUnitState.Defender; //변수 직접적으로 바꾸는 코드 쓰지 말기 
         }
     }
 

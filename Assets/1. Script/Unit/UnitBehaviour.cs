@@ -9,7 +9,8 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
     public float distanceToPlayer;
     public float zoneDistanceToPlayer;
     public Player player;
-    public bool targetting; 
+    public bool targetting;
+    public PhotonView targetPhotonView;
     private void Awake()
     {
         unit = GetComponentInParent<Unit>();
@@ -67,8 +68,7 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
     {
         unit.animator.SetBool("IsRunning", false);
 
-        //target? ???? ???? ?? ??? ???? ???? ??? ??? ?????
-        // + ??? ??? ?? ??? ???? ?? ??? ???? ???? ??? ? ??? ?? ???? ?????
+        
         Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
 
         if (cols.Length > 0)
@@ -88,35 +88,82 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
 
             if (closestTarget != null)
             {
-                PhotonView targetPhotonView = closestTarget.GetComponent<PhotonView>();
-                if (targetPhotonView != null)
-                {
-                    int targetViewID = targetPhotonView.ViewID;
-                    photonView.RPC("RPCSetTarget", RpcTarget.All, targetViewID);
-                    unit.EnterState(UnitState.Approach);
-                    return;
-                }
+                targetPhotonView = closestTarget.GetComponent<PhotonView>();
+                int targetViewID = targetPhotonView.ViewID;
+                photonView.RPC("RPCSetTarget", RpcTarget.All, targetViewID);
+                unit.EnterState(UnitState.Approach);
+                return;
             }
         }
     }
-
+    
     [PunRPC]
     public void RPCSetTarget(int targetID)
     {
         GameObject target = PhotonView.Find(targetID).gameObject;
-        unit.target = target;
+        if (target != null)
+        {
+            unit.target = target;
+            Debug.Log($"[RPC] Target set to: {target.name} (ViewID: {targetID})");
+        }
+        else
+        {
+            Debug.LogError($"[RPC] Target not found! (ViewID: {targetID})");
+        }
     }
 
     public virtual void UpdateApproachState()
     {
-        //???? ?????? ???????????
+        if (unit.target == null || !unit.target.activeInHierarchy)
+        {
+            if (unit.zoneUnit)
+            {
+                Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
 
-        //?????? null???? , ???? -> Idle
-        //?????? ???? ???? ?????? ???????? ?? -> Attack
-        distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
+                if (cols.Length > 0)
+                {
+                    GameObject closestTarget = null;
+                    float closestDistance = Mathf.Infinity;
+
+                    foreach (Collider col in cols)
+                    {
+                        float distance = Vector3.Distance(transform.position, col.transform.position);
+                        if (distance < closestDistance)
+                        {
+                            closestDistance = distance;
+                            closestTarget = col.gameObject;
+                        }
+                    }
+
+                    if (closestTarget != null)
+                    {
+                        PhotonView targetPhotonView = closestTarget.GetComponent<PhotonView>();
+                        int targetViewID = targetPhotonView.ViewID;
+                        photonView.RPC("RPCSetTarget", RpcTarget.All, targetViewID);
+                    }
+                }
+                else
+                {
+                    unit.EnterState(UnitState.Idle);
+                }
+            }
+        }
+        if (unit.target != null && unit.rangePoint != null)
+        {
+            distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
+        }
+        else if(unit.target == null)
+        {
+            unit.target = null;
+            return;
+        }
         if (distanceToPlayer > unit.targetingRange)
         {
             unit.target = null;
+            if (!unit.zoneUnit)
+            {
+                unit.EnterState(UnitState.Idle);
+            }
             return;
         }
         else if (distanceToPlayer < unit.attackRange)
@@ -126,7 +173,6 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
             return;
         }
         Move(unit.target.gameObject);
-        
     }
    
     public void Move(GameObject target)
@@ -136,7 +182,6 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
         unit.animator.SetBool("IsRunning", true);
         unit.agent.SetDestination(target.transform.position);
 
-        //?????? ???????? ????
         Vector3 direction = (target.transform.position - transform.position).normalized;
         direction.y = 0;
         Quaternion lookRotation = Quaternion.LookRotation(direction);
