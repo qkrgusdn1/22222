@@ -19,6 +19,14 @@ public class LobbyMgr : MonoBehaviour
         instance = this;
     }
 
+    private void Start()
+    {
+        AudioMgr.Instance.waitingMusic.gameObject.SetActive(false);
+        AudioMgr.Instance.inGameMusic.gameObject.SetActive(false);
+        AudioMgr.Instance.selectMusic.gameObject.SetActive(false);
+        AudioMgr.Instance.lobbyMusic.gameObject.SetActive(true);
+    }
+
     public TMP_InputField nickNameInputField;
     public GameObject loadingPanel;
     public GameObject failRoomPanel;

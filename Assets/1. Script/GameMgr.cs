@@ -36,6 +36,10 @@ public class GameMgr : MonoBehaviourPunCallbacks
     public CinemachineVirtualCamera virtualCamera;
     private void Start()
     {
+        AudioMgr.Instance.waitingMusic.gameObject.SetActive(false);
+        AudioMgr.Instance.inGameMusic.gameObject.SetActive(false);
+        AudioMgr.Instance.selectMusic.gameObject.SetActive(true);
+        AudioMgr.Instance.lobbyMusic.gameObject.SetActive(false);
         GameObject characterObj = PhotonNetwork.Instantiate("Character", Vector3.zero, Quaternion.identity);
         character = characterObj.GetComponent<Character>();
         if (PhotonNetwork.IsMasterClient)
@@ -45,7 +49,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
     IEnumerator CountDown()
     {
         spawnCount = maxSpawnCount;
-        while (spawnCount > 0)
+        while (spawnCount > -1)
         {
             photonView.RPC("RPCUpdateCountdown", RpcTarget.All, spawnCount);
             yield return new WaitForSeconds(1);
@@ -56,6 +60,10 @@ public class GameMgr : MonoBehaviourPunCallbacks
     [PunRPC]
     public void RPCStartGame()
     {
+        AudioMgr.Instance.waitingMusic.gameObject.SetActive(false);
+        AudioMgr.Instance.inGameMusic.gameObject.SetActive(true);
+        AudioMgr.Instance.selectMusic.gameObject.SetActive(false);
+        AudioMgr.Instance.lobbyMusic.gameObject.SetActive(false);
         selectSpawnCanvas.SetActive(false);
         character.StartGame(spawnPoints[spawnPointIdx].transform.position);
     }

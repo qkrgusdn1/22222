@@ -12,10 +12,11 @@ public class AudioMgr : MonoBehaviour
     void Awake()
     {
         instance = this;
+        DontDestroyOnLoad(gameObject);
     }
-
     public AudioSource lobbyMusic;
     public AudioSource waitingMusic;
     public AudioSource selectMusic;
     public AudioSource inGameMusic;
 }
+

@@ -17,6 +17,10 @@ public class WatingMgr : MonoBehaviourPunCallbacks
 
     private void Start()
     {
+        AudioMgr.Instance.waitingMusic.gameObject.SetActive(true);
+        AudioMgr.Instance.inGameMusic.gameObject.SetActive(false);
+        AudioMgr.Instance.selectMusic.gameObject.SetActive(false);
+        AudioMgr.Instance.lobbyMusic.gameObject.SetActive(false);
         PhotonNetwork.LocalPlayer.NickName = PhotonMgr.Instance.nickName;
         playerNickName.text = PhotonNetwork.PlayerList[0].NickName;
         photonView.RPC("RPCEnteredPlayer", RpcTarget.All);
@@ -65,7 +69,7 @@ public class WatingMgr : MonoBehaviourPunCallbacks
     }
     private IEnumerator Countdown()
     {
-        while (countDown > 0)
+        while (countDown > -1)
         {
             photonView.RPC("RPCUpdateCountdown", RpcTarget.All, countDown);
             yield return new WaitForSeconds(1);
