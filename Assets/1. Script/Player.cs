@@ -98,8 +98,6 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
     Unit currentUnit;
 
-    int myIndex;
-
     private void Awake()
     {
         inventory = GetComponentInChildren<Inventory>();
@@ -129,26 +127,22 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         rb = GetComponent<Rigidbody>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
-        for (int i = 0; i < PhotonNetwork.PlayerList.Length; i++)
-        {
-            if (PhotonNetwork.PlayerList[i] == PhotonNetwork.LocalPlayer)
-            {
-                myIndex = i;
-                break;
-            }
-        }
-        nickNameText.text = PhotonNetwork.PlayerList[myIndex].NickName;
         if (!photonView.IsMine)
         {
             canvas.SetActive(false);
             gameObject.layer = LayerMask.NameToLayer("Enemy");
-            
         }
         else
         {
             outCanvas.SetActive(false);
             gameObject.layer = LayerMask.NameToLayer("Friendly");
+            photonView.RPC("RPCSetNickName", RpcTarget.All, PhotonNetwork.LocalPlayer.NickName);
         }
+    }
+    [PunRPC]
+    public void RPCSetNickName(string nickName)
+    {
+        nickNameText.text = nickName;
     }
 
     public void Attack(Fighter target, float damage)
@@ -504,17 +498,17 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         Unit unit = PhotonView.Find(unitViewID).GetComponent<Unit>();
         friendlyUnits.Add(unit);
         unit.Catched(this);
-        
+
         if (photonView.IsMine)
         {
             FriendlyBtn friendlyBtn = Instantiate(friendlyBtnPrefab, inventory.friendlyBtnGroup.transform);
             friendlyBtns.Add(friendlyBtn);
             friendlyBtn.SetFriendlyBtn(inventory, unit);
         }
-       
-        
+
+
         catchTarget = null;
-        
+
     }
 
     private void OnCollisionStay(Collision collision)

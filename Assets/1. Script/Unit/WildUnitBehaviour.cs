@@ -8,45 +8,65 @@ public class WildUnitBehaviour : UnitBehaviour
 {
     public override void UpdateApproachState()
     {
-        if (targetPhotonView != null && targetPhotonView.IsMine)
+        if (unit.target != null && unit.zone != null && unit.zoneUnit)
         {
-            if (unit.target != null && unit.zone != null)
-            {
-                zoneDistanceToPlayer = Vector3.Distance(unit.zone.transform.position, unit.target.transform.position);
-            }
-            photonView.RPC("RPCZoneUnitCheckMove", RpcTarget.All);
-        }
-        base.UpdateApproachState();
-    }
-
-    [PunRPC]
-    public void RPCZoneUnitCheckMove()
-    {
-        if (unit.zoneUnit && unit.turnPoint.position != null)
-        {
+            zoneDistanceToPlayer = Vector3.Distance(unit.zone.transform.position, unit.target.transform.position);
             if (zoneDistanceToPlayer > unit.zone.zoneRange)
             {
                 unit.target = null;
-                photonView.RPC("RPCMoveTrunPoint", RpcTarget.All);
-                targetting = true;
+
+                Collider[] cols = Physics.OverlapSphere(unit.zone.transform.position, unit.zone.zoneRange, unit.targetLayer);
+                if (cols.Length > 0)
+                {
+                    GameObject closestTarget = null;
+                    float closestDistance = Mathf.Infinity;
+
+                    foreach (Collider col in cols)
+                    {
+                        float distance = Vector3.Distance(transform.position, col.transform.position);
+                        if (distance < closestDistance)
+                        {
+                            closestDistance = distance;
+                            closestTarget = col.gameObject;
+                        }
+                    }
+
+                    if (closestTarget != null)
+                    {
+                        targetPhotonView = closestTarget.GetComponent<PhotonView>();
+                        MoveTrunPoint();
+                    }
+                }
+                else
+                {
+                    MoveTrunPoint();
+                }
                 return;
             }
-
-            targetting = false;
-            Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
-
-            if (cols.Length <= 0)
+            float distanceToTarget = Vector3.Distance(unit.transform.position, unit.target.transform.position);
+            if (distanceToTarget < unit.attackRange)
             {
-                photonView.RPC("RPCMoveTrunPoint", RpcTarget.All);
+                unit.EnterState(UnitState.Attack);
+                return;
+            }
+            else if (distanceToTarget > unit.targetingRange)
+            {
+                unit.target = null;
+                MoveTrunPoint();
+                return;
+            }
+
+            if (targetPhotonView != null)
+            {
+                photonView.RPC("RPCMove", RpcTarget.All, targetPhotonView.ViewID);
                 return;
             }
         }
-
-        if (unit.target == null && !targetting)
+        else if(unit.target == null && unit.zone != null && unit.zoneUnit)
         {
-            unit.EnterState(UnitState.Idle);
-            return;
+            MoveTrunPoint();
         }
+        base.UpdateApproachState();
     }
     
 }

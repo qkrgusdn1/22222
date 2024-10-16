@@ -3319,6 +3319,7 @@ MonoBehaviour:
   turnPointObj: {fileID: 0}
   turnPointPrefab: {fileID: 6234029356431228055, guid: 1e724939a36c75f45afe8f2d88bb7400,
     type: 3}
+  ownerPlayer: {fileID: 0}
 --- !u!136 &684338821514662603
 CapsuleCollider:
   m_ObjectHideFlags: 0

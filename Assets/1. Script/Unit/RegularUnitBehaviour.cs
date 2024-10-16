@@ -83,9 +83,11 @@ public class RegularUnitBehaviour : UnitBehaviour
         else if (regularUnitState == RegularUnitState.Defender)
         {
             unit.EnterState(UnitState.Idle);
-            unit.turnPointObj.transform.position = transform.position;
-            unit.turnPoint = unit.turnPointObj.transform;
-
+            if(unit.turnPointObj != null)
+            {
+                unit.turnPointObj.transform.position = transform.position;
+                unit.turnPoint = unit.turnPointObj.transform;
+            }
             regularStateName = "»ç¼ö";
         }
 
@@ -136,24 +138,14 @@ public class RegularUnitBehaviour : UnitBehaviour
         {
             Debug.Log("Follow");
             unit.animator.SetBool("IsRunning", true);
-            unit.agent.SetDestination(player.transform.position);
-
-            Vector3 direction = (player.transform.position - transform.position).normalized;
-            direction.y = 0;
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            unit.body.transform.rotation = Quaternion.Slerp(unit.body.transform.rotation, lookRotation, Time.deltaTime * 100);
+            photonView.RPC("RPCMove", RpcTarget.All, unit.ownerPlayer.GetComponent<PhotonView>().ViewID);
             return;
         }
         if (regularUnitState == RegularUnitState.Guard && unit.target == null)
         {
             Debug.Log("Guard");
             unit.animator.SetBool("IsRunning", true);
-            unit.agent.SetDestination(player.transform.position);
-
-            Vector3 direction = (player.transform.position - transform.position).normalized;
-            direction.y = 0;
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            unit.body.transform.rotation = Quaternion.Slerp(unit.body.transform.rotation, lookRotation, Time.deltaTime * 100);
+            photonView.RPC("RPCMove", RpcTarget.All, unit.ownerPlayer.GetComponent<PhotonView>().ViewID);
             return;
         }
         else if (regularUnitState == RegularUnitState.Defender)
@@ -163,7 +155,8 @@ public class RegularUnitBehaviour : UnitBehaviour
             if (cols.Length <= 0)
             {
                 Debug.Log("MoveTrunPoint");
-                photonView.RPC("RPCMoveTrunPoint", RpcTarget.All);
+                if(unit.ownerPlayer.photonView.IsMine)
+                    MoveTrunPoint();
                 return;
             }
             

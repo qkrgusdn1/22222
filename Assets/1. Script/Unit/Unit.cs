@@ -74,7 +74,7 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
     public GameObject turnPointObj;
     public GameObject turnPointPrefab;
 
-    Player ownerPlayer;
+    public Player ownerPlayer;
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
@@ -95,7 +95,6 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
         rb = GetComponent<Rigidbody>(); 
         agent = GetComponent<NavMeshAgent>();
         agent.speed = moveSpeed;
-        
     }
 
     private void InitializeUnit()
@@ -278,10 +277,15 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
             curUnitBehaviour.GetComponent<UnitBehaviour>().PlayerSetting(player);
             hpBar.color = Color.green;
 
-            zoneUnit = false;
+            photonView.RPC("RPCZoneUnit", RpcTarget.All);
             RegularUnitBehaviour regularUnitBehaviour = (RegularUnitBehaviour)curUnitBehaviour;
             regularUnitBehaviour.OnClickedChangeRegularUnitStateBtn(RegularUnitState.Defender.ToString());
         }
+    }
+    [PunRPC]
+    public void RPCZoneUnit()
+    {
+        zoneUnit = false;
     }
 
 }

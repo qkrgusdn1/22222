@@ -54,7 +54,7 @@ public class Zone : MonoBehaviourPunCallbacks
         }
     }
     [PunRPC]
-    void RPCUnitPositions(int unitViewID, int unitPositionViewID)
+    public void RPCUnitPositions(int unitViewID, int unitPositionViewID)
     {
         GameObject unitObj = PhotonView.Find(unitViewID).gameObject;
         Transform unitPosition = PhotonView.Find(unitPositionViewID).transform;

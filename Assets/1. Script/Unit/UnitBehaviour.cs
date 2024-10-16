@@ -68,7 +68,13 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
     {
         unit.animator.SetBool("IsRunning", false);
 
+        if(unit.target != null && unit.zoneUnit)
+        {
+            zoneDistanceToPlayer = Vector3.Distance(unit.zone.transform.position, unit.target.transform.position);
+            photonView.RPC("RPCMove", RpcTarget.All, targetPhotonView.ViewID);
+        }
         
+
         Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
 
         if (cols.Length > 0)
@@ -91,7 +97,7 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
                 targetPhotonView = closestTarget.GetComponent<PhotonView>();
                 int targetViewID = targetPhotonView.ViewID;
                 photonView.RPC("RPCSetTarget", RpcTarget.All, targetViewID);
-                unit.EnterState(UnitState.Approach);
+                
                 return;
             }
         }
@@ -103,12 +109,13 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
         GameObject target = PhotonView.Find(targetID)?.gameObject;
         if (target != null)
         {
+            unit.EnterState(UnitState.Approach);
             unit.target = target;
             Debug.Log($"[RPC] Target set to: {target.name} (ViewID: {targetID})");
         }
         else
         {
-            Debug.LogError($"[RPC] Target not found! (ViewID: {targetID})");
+            unit.EnterState(UnitState.Idle);
         }
     }
 
@@ -141,17 +148,20 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
     public void RPCMove(int targetID)
     {
         GameObject target = PhotonView.Find(targetID).gameObject;
-        unit.agent.isStopped = false;
-        unit.animator.SetBool("IsRunning", true);
-        unit.agent.SetDestination(target.transform.position);
+        if(target != null)
+        {
+            unit.agent.isStopped = false;
+            unit.animator.SetBool("IsRunning", true);
+            unit.agent.SetDestination(target.transform.position);
 
-        Vector3 direction = (target.transform.position - transform.position).normalized;
-        direction.y = 0;
-        Quaternion lookRotation = Quaternion.LookRotation(direction);
-        unit.body.transform.rotation = Quaternion.Slerp(unit.body.transform.rotation, lookRotation, Time.deltaTime * 100);
+            Vector3 direction = (target.transform.position - transform.position).normalized;
+            direction.y = 0;
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            unit.body.transform.rotation = Quaternion.Slerp(unit.body.transform.rotation, lookRotation, Time.deltaTime * 100);
+        }
     }
-    [PunRPC]
-    public void RPCMoveTrunPoint()
+
+    public void MoveTrunPoint()
     {
         unit.agent.isStopped = false;
         Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
@@ -160,7 +170,6 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
             PhotonView targetPhotonView = cols[0].GetComponent<PhotonView>();
             int targetViewID = targetPhotonView.ViewID;
             photonView.RPC("RPCSetTarget", RpcTarget.All, targetViewID);
-            
             distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
         }
         if (Vector3.Distance(transform.position, unit.turnPoint.position) > 0.5f)
@@ -170,6 +179,10 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
         }
         else if (Vector3.Distance(transform.position, unit.turnPoint.position) <= 0.5f)
         {
+            if (unit.target != null)
+            {
+                unit.target = null;
+            }
             unit.EnterState(UnitState.Idle);
         }
     }
