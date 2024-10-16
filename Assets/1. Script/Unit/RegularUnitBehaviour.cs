@@ -83,11 +83,7 @@ public class RegularUnitBehaviour : UnitBehaviour
         else if (regularUnitState == RegularUnitState.Defender)
         {
             unit.EnterState(UnitState.Idle);
-            if(unit.turnPointObj != null)
-            {
-                unit.turnPointObj.transform.position = transform.position;
-                unit.turnPoint = unit.turnPointObj.transform;
-            }
+            unit.turnPoint = transform.position;
             regularStateName = "»ç¼ö";
         }
 
@@ -114,7 +110,7 @@ public class RegularUnitBehaviour : UnitBehaviour
 
         if (unit.attackTimer <= 0)
         {
-            if (Vector3.Distance(transform.position, unit.turnPoint.position) > 0.5f && unit.target == null && regularUnitState == RegularUnitState.Defender)
+            if (Vector3.Distance(transform.position, unit.turnPoint) > 0.5f && unit.target == null && regularUnitState == RegularUnitState.Defender)
             {
                 unit.agent.isStopped = false;
                 unit.EnterState(UnitState.Approach);
@@ -138,14 +134,13 @@ public class RegularUnitBehaviour : UnitBehaviour
         {
             Debug.Log("Follow");
             unit.animator.SetBool("IsRunning", true);
-            photonView.RPC("RPCMove", RpcTarget.All, unit.ownerPlayer.GetComponent<PhotonView>().ViewID);
+
             return;
         }
         if (regularUnitState == RegularUnitState.Guard && unit.target == null)
         {
             Debug.Log("Guard");
             unit.animator.SetBool("IsRunning", true);
-            photonView.RPC("RPCMove", RpcTarget.All, unit.ownerPlayer.GetComponent<PhotonView>().ViewID);
             return;
         }
         else if (regularUnitState == RegularUnitState.Defender)
@@ -155,8 +150,7 @@ public class RegularUnitBehaviour : UnitBehaviour
             if (cols.Length <= 0)
             {
                 Debug.Log("MoveTrunPoint");
-                if(unit.ownerPlayer.photonView.IsMine)
-                    MoveTrunPoint();
+                unit.EnterState(UnitState.Turn);
                 return;
             }
             

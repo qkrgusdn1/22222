@@ -22,11 +22,11 @@ public class RoomJoinBtn : MonoBehaviour
             return;
         }
         PhotonMgr.Instance.nickName = LobbyMgr.Instance.nickNameInputField.text;
-        LobbyMgr.Instance.lodingPanel.SetActive(true);
+        LobbyMgr.Instance.loadingPanel.SetActive(true);
         PhotonMgr.Instance.TryToJoinRoom(info.Name, () =>
         {
             Debug.Log("방 접속 실패");
-            LobbyMgr.Instance.lodingPanel.SetActive(false);
+            LobbyMgr.Instance.loadingPanel.SetActive(false);
             //LobbyMgr.Instance.failRoomPanel.SetActive(true);
             GetComponentInChildren<FindRoomPanel>().CreateRoom(PhotonMgr.Instance.curRoomInfos);
         } );

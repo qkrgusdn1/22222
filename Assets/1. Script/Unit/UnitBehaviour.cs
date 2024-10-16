@@ -1,5 +1,6 @@
 using Photon.Pun;
 using System;
+using UnityEditor;
 using UnityEngine;
 
 public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
@@ -41,6 +42,10 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
         {
             unit.animator.SetBool("IsRunning", false);
             unit.animator.SetBool("IsKnockDown", true);
+        }else if(unitState == UnitState.Turn)
+        {
+            unit.agent.isStopped = false;
+            unit.animator.SetBool("IsRunning", true);
         }
     }
 
@@ -62,21 +67,21 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
         {
             return;
         }
+        else if (unit.unitState == UnitState.Turn)
+        {
+            UpdateTurnState();
+        }
+    }
+
+    public virtual void UpdateTurnState()
+    {
+
     }
 
     public virtual void UpdateIdleState()
     {
         unit.animator.SetBool("IsRunning", false);
-
-        if(unit.target != null && unit.zoneUnit)
-        {
-            zoneDistanceToPlayer = Vector3.Distance(unit.zone.transform.position, unit.target.transform.position);
-            photonView.RPC("RPCMove", RpcTarget.All, targetPhotonView.ViewID);
-        }
-        
-
         Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
-
         if (cols.Length > 0)
         {
             GameObject closestTarget = null;
@@ -84,11 +89,20 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
 
             foreach (Collider col in cols)
             {
-                float distance = Vector3.Distance(transform.position, col.transform.position);
-                if (distance < closestDistance)
+                PhotonView targetPhotonView = col.GetComponent<PhotonView>();
+
+                if (targetPhotonView != null)
                 {
-                    closestDistance = distance;
-                    closestTarget = col.gameObject;
+                    float distance = Vector3.Distance(transform.position, col.transform.position);
+
+                    if (targetPhotonView.Owner != PhotonNetwork.LocalPlayer || targetPhotonView.IsMine)
+                    {
+                        if (distance < closestDistance)
+                        {
+                            closestDistance = distance;
+                            closestTarget = col.gameObject;
+                        }
+                    }
                 }
             }
 
@@ -97,7 +111,7 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
                 targetPhotonView = closestTarget.GetComponent<PhotonView>();
                 int targetViewID = targetPhotonView.ViewID;
                 photonView.RPC("RPCSetTarget", RpcTarget.All, targetViewID);
-                
+                unit.EnterState(UnitState.Approach);
                 return;
             }
         }
@@ -106,10 +120,9 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
     [PunRPC]
     public void RPCSetTarget(int targetID)
     {
-        GameObject target = PhotonView.Find(targetID)?.gameObject;
+        GameObject target = PhotonView.Find(targetID).gameObject;
         if (target != null)
         {
-            unit.EnterState(UnitState.Approach);
             unit.target = target;
             Debug.Log($"[RPC] Target set to: {target.name} (ViewID: {targetID})");
         }
@@ -121,6 +134,9 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
 
     public virtual void UpdateApproachState()
     {
+        unit.agent.isStopped = false;
+        unit.animator.SetBool("IsRunning", true);
+
         if (unit.target != null)
         {
             distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
@@ -139,51 +155,18 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
                 unit.EnterState(UnitState.Attack);
                 return;
             }
-            if (targetPhotonView != null)
-                photonView.RPC("RPCMove", RpcTarget.All, targetPhotonView.ViewID);
         }
-    }
-
-    [PunRPC]
-    public void RPCMove(int targetID)
-    {
-        GameObject target = PhotonView.Find(targetID).gameObject;
-        if(target != null)
+        else
         {
-            unit.agent.isStopped = false;
-            unit.animator.SetBool("IsRunning", true);
-            unit.agent.SetDestination(target.transform.position);
-
-            Vector3 direction = (target.transform.position - transform.position).normalized;
-            direction.y = 0;
-            Quaternion lookRotation = Quaternion.LookRotation(direction);
-            unit.body.transform.rotation = Quaternion.Slerp(unit.body.transform.rotation, lookRotation, Time.deltaTime * 100);
-        }
-    }
-
-    public void MoveTrunPoint()
-    {
-        unit.agent.isStopped = false;
-        Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
-        if (cols.Length > 0)
-        {
-            PhotonView targetPhotonView = cols[0].GetComponent<PhotonView>();
-            int targetViewID = targetPhotonView.ViewID;
-            photonView.RPC("RPCSetTarget", RpcTarget.All, targetViewID);
-            distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
-        }
-        if (Vector3.Distance(transform.position, unit.turnPoint.position) > 0.5f)
-        {
-            int targetViewID = unit.turnPoint.gameObject.GetComponent<PhotonView>().ViewID;
-            photonView.RPC("RPCMove", RpcTarget.All, targetViewID);
-        }
-        else if (Vector3.Distance(transform.position, unit.turnPoint.position) <= 0.5f)
-        {
-            if (unit.target != null)
+            if (!unit.zoneUnit)
             {
-                unit.target = null;
+                unit.EnterState(UnitState.Idle);
             }
-            unit.EnterState(UnitState.Idle);
+            else
+            {
+                unit.EnterState(UnitState.Turn);
+            }
+                
         }
     }
 

@@ -3315,10 +3315,7 @@ MonoBehaviour:
     m_Bits: 512
   die: 0
   zoneUnit: 0
-  turnPoint: {fileID: 0}
-  turnPointObj: {fileID: 0}
-  turnPointPrefab: {fileID: 6234029356431228055, guid: 1e724939a36c75f45afe8f2d88bb7400,
-    type: 3}
+  turnPoint: {x: 0, y: 0, z: 0}
   ownerPlayer: {fileID: 0}
 --- !u!136 &684338821514662603
 CapsuleCollider:

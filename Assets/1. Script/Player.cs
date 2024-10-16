@@ -467,8 +467,6 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
                 }
             }
         }
-
-
     }
 
     public void OnRegularUnitState()

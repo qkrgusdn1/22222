@@ -62,7 +62,7 @@ public class Zone : MonoBehaviourPunCallbacks
         Unit unit = unitObj.GetComponent<Unit>();
         units.Add(unit);
         unit.zoneUnit = true;
-        unit.turnPoint = unitPosition;
+        unit.turnPoint = unitPosition.position;
         unit.zone = this;
     }
 }

@@ -8,14 +8,47 @@ public class WildUnitBehaviour : UnitBehaviour
 {
     public override void UpdateApproachState()
     {
-        if (unit.target != null && unit.zone != null && unit.zoneUnit)
+        if (unit.zoneUnit && unit.target != null)
         {
-            zoneDistanceToPlayer = Vector3.Distance(unit.zone.transform.position, unit.target.transform.position);
-            if (zoneDistanceToPlayer > unit.zone.zoneRange)
+            float dis = Vector3.Distance(unit.zone.transform.position, unit.target.transform.position);
+            if (dis > unit.zone.zoneRange)
             {
-                unit.target = null;
+                unit.EnterState(UnitState.Turn);
+                return;
+            }
+        }
+        base.UpdateApproachState();
+    }
 
-                Collider[] cols = Physics.OverlapSphere(unit.zone.transform.position, unit.zone.zoneRange, unit.targetLayer);
+    public override void UpdateTurnState()
+    {
+        if (unit.zoneUnit)
+        {
+            if(unit.target == null)
+            {
+                if (Vector3.Distance(unit.transform.position, unit.turnPoint) <= 0.5f)
+                {
+                    unit.target = null;
+                    unit.EnterState(UnitState.Idle);
+                    return;
+                }
+                return;
+            }
+            float dis = Vector3.Distance(unit.zone.transform.position, unit.target.transform.position);
+            if (dis > unit.zone.zoneRange)
+            {
+                if (Vector3.Distance(unit.transform.position, unit.turnPoint) <= 0.5f)
+                {
+                    unit.target = null;
+                    unit.EnterState(UnitState.Idle);
+                    return;
+                }
+                return;
+            }
+            if (unit.target != null && Vector3.Distance(unit.transform.position, unit.target.transform.position) <= unit.targetingRange)
+            {
+                Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
+
                 if (cols.Length > 0)
                 {
                     GameObject closestTarget = null;
@@ -34,39 +67,17 @@ public class WildUnitBehaviour : UnitBehaviour
                     if (closestTarget != null)
                     {
                         targetPhotonView = closestTarget.GetComponent<PhotonView>();
-                        MoveTrunPoint();
+                        int targetViewID = targetPhotonView.ViewID;
+                        photonView.RPC("RPCSetTarget", RpcTarget.All, targetViewID);
+                        unit.EnterState(UnitState.Approach);
+                        return;
                     }
                 }
-                else
-                {
-                    MoveTrunPoint();
-                }
-                return;
-            }
-            float distanceToTarget = Vector3.Distance(unit.transform.position, unit.target.transform.position);
-            if (distanceToTarget < unit.attackRange)
-            {
-                unit.EnterState(UnitState.Attack);
-                return;
-            }
-            else if (distanceToTarget > unit.targetingRange)
-            {
-                unit.target = null;
-                MoveTrunPoint();
-                return;
-            }
-
-            if (targetPhotonView != null)
-            {
-                photonView.RPC("RPCMove", RpcTarget.All, targetPhotonView.ViewID);
+                
+                unit.EnterState(UnitState.Approach);
                 return;
             }
         }
-        else if(unit.target == null && unit.zone != null && unit.zoneUnit)
-        {
-            MoveTrunPoint();
-        }
-        base.UpdateApproachState();
     }
-    
+
 }

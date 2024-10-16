@@ -20,7 +20,7 @@ public class LobbyMgr : MonoBehaviour
     }
 
     public TMP_InputField nickNameInputField;
-    public GameObject lodingPanel;
+    public GameObject loadingPanel;
     public GameObject failRoomPanel;
 
     public void OnClikedExitBtn()

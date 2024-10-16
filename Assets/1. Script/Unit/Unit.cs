@@ -70,9 +70,8 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
     public bool die;
 
     public bool zoneUnit;
-    public Transform turnPoint;
-    public GameObject turnPointObj;
-    public GameObject turnPointPrefab;
+
+    public Vector3 turnPoint;
 
     public Player ownerPlayer;
     private void OnDrawGizmosSelected()
@@ -121,9 +120,7 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
         }
         else if(type == UnitBehaviourType.Reguler)
         {
-            GameObject turnPoint = Instantiate(turnPointPrefab, transform.position, Quaternion.identity, GameMgr.Instance.trunPointGroup.transform);
-            turnPointObj = turnPoint;
-            this.turnPoint = turnPointObj.transform;
+            turnPoint = transform.position;
             targetLayer = LayerMask.GetMask("Enemy");
             gameObject.layer = LayerMask.NameToLayer("Friendly");
             weapon.hitLayerMask = targetLayer;
@@ -141,6 +138,9 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
 
     public virtual void EnterState(UnitState state)
     {
+        if (unitState == state)
+            return;
+
         string stateName = state.ToString();
         photonView.RPC("RPCEnterState", RpcTarget.All, stateName);
     }
@@ -206,6 +206,26 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
     private void Update()
     {
         curUnitBehaviour.UpdateState(unitState);
+
+        if (!PhotonNetwork.IsMasterClient)
+            return;
+
+        if(unitState == UnitState.Approach && target != null)
+        {
+            agent.SetDestination(target.transform.position);
+
+            Vector3 direction = (target.transform.position - transform.position).normalized;
+            direction.y = 0;
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            body.transform.rotation = Quaternion.Slerp(body.transform.rotation, lookRotation, Time.deltaTime * 100);
+        }else if(unitState == UnitState.Turn && zoneUnit)
+        {
+            agent.SetDestination(turnPoint);
+            Vector3 direction = (turnPoint - transform.position).normalized;
+            direction.y = 0;
+            Quaternion lookRotation = Quaternion.LookRotation(direction);
+            body.transform.rotation = Quaternion.Slerp(body.transform.rotation, lookRotation, Time.deltaTime * 100);
+        }
     }
     private IEnumerator CoSmoothHpBar(float targetFillAmount, float duration)
     {
@@ -295,7 +315,8 @@ public enum UnitState
     Idle,
     Approach,
     Attack,
-    KnockDown
+    KnockDown,
+    Turn
 }
 
 public enum UnitType
