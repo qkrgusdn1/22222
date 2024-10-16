@@ -69,6 +69,9 @@ MonoBehaviour:
   - RPCSetTarget
   - RPCSensingCols
   - RPCWildApproach
+  - RPCMove
+  - RPCZoneUnitCheckMove
+  - RPCMoveTrunPoint
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

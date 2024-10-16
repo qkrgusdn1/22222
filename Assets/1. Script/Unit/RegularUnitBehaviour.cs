@@ -53,7 +53,6 @@ public class RegularUnitBehaviour : UnitBehaviour
         }
     }
 
-    //?? ????? ?? ???? ???? ??? ?? ???? ??
     public void OnClickedChangeRegularUnitStateBtn(string regularStateBtnName)
     {
         photonView.RPC("RPCOnClickedChangeRegularUnitStateBtn", RpcTarget.All, regularStateBtnName);
@@ -164,7 +163,7 @@ public class RegularUnitBehaviour : UnitBehaviour
             if (cols.Length <= 0)
             {
                 Debug.Log("MoveTrunPoint");
-                MoveTrunPoint();
+                photonView.RPC("RPCMoveTrunPoint", RpcTarget.All);
                 return;
             }
             
