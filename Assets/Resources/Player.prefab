@@ -6801,6 +6801,7 @@ MonoBehaviour:
   maxCatchTimer: 0
   activeStateBg: 0
   friendlyUnits: []
+  die: 0
 --- !u!54 &3908128006735574896
 Rigidbody:
   m_ObjectHideFlags: 0

@@ -9,6 +9,7 @@ using static UnityEngine.UI.CanvasScaler;
 using TMPro;
 using Photon.Pun;
 using System;
+using Photon.Realtime;
 
 public class Unit : MonoBehaviourPunCallbacks, Fighter
 {
@@ -209,7 +210,7 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
 
         if (!PhotonNetwork.IsMasterClient)
             return;
-
+        body.transform.position = transform.position;
         if(unitState == UnitState.Approach && target != null)
         {
             agent.SetDestination(target.transform.position);
@@ -267,6 +268,7 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
         {
             die = true;
             animator.Play("Die");
+            
         }
     }
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -291,19 +293,35 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
         animator.SetBool("IsKnockDown", false);
         agent.isStopped = false;
 
-        if (player.photonView.IsMine)
+        PhotonView playerPhotonView = player.GetComponent<PhotonView>();
+        Debug.Log(playerPhotonView);
+        photonView.RPC("RPCCatched", RpcTarget.All, playerPhotonView.ViewID);
+    }
+
+    [PunRPC]
+    public void RPCCatched(int selectingPlayerId)
+    {
+        if (selectingPlayerId != GameMgr.Instance.player.GetComponent<PhotonView>().ViewID)
         {
+            Debug.Log("Wild");
+            curUnitBehaviour = GetUnitBehaviour(UnitBehaviourType.Wild);
+            hpBar.color = Color.white;
+        }
+        else
+        {
+            Debug.Log("Reguler");
+            GameObject player = PhotonView.Find(selectingPlayerId).gameObject;
             curUnitBehaviour = GetUnitBehaviour(UnitBehaviourType.Reguler);
-            curUnitBehaviour.GetComponent<UnitBehaviour>().PlayerSetting(player);
+            curUnitBehaviour.GetComponent<UnitBehaviour>().PlayerSetting(player.GetComponent<Player>());
             hpBar.color = Color.green;
 
-            photonView.RPC("RPCZoneUnit", RpcTarget.All);
+            photonView.RPC("RPCNoZoneUnit", RpcTarget.All);
             RegularUnitBehaviour regularUnitBehaviour = (RegularUnitBehaviour)curUnitBehaviour;
             regularUnitBehaviour.OnClickedChangeRegularUnitStateBtn(RegularUnitState.Defender.ToString());
         }
     }
     [PunRPC]
-    public void RPCZoneUnit()
+    public void RPCNoZoneUnit()
     {
         zoneUnit = false;
     }

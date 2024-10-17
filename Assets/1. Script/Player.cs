@@ -96,6 +96,8 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
     public List<Unit> friendlyUnits = new List<Unit>();
 
+    public bool die;
+
     Unit currentUnit;
 
     private void Awake()
@@ -114,6 +116,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         animationEventHandler.finishAttackListener += FinishAttack;
         animationEventHandler.startRollListener += StartRoll;
         animationEventHandler.endRollListener += EndRoll;
+        animationEventHandler.dieListener += Die;
         mainCollider.enabled = true;
         rollCollider.enabled = false;
 
@@ -184,9 +187,20 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
         if (hp <= 0)
         {
+            die = true;
             animator.Play("Die");
         }
     }
+
+    void Die()
+    {
+        if (photonView.IsMine && die)
+        {
+            GameMgr.Instance.diePanel.SetActive(true);
+            StartCoroutine(GameMgr.Instance.DieCountDown());
+        }
+    }
+
 
     private IEnumerator CoSmoothHpBar(float targetFillAmount, float duration)
     {
@@ -250,7 +264,10 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     {
         if (!photonView.IsMine)
             return;
-
+        if (die)
+            return;
+        if (PhotonMgr.Instance.result)
+            return;
         if (stopAttackTime > 0 && !noFinshAttack)
         {
             stopAttackTime -= Time.deltaTime;
@@ -487,7 +504,8 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
     public void Catch(Unit unit)
     {
-        photonView.RPC("RPCCatch", RpcTarget.All, unit.photonView.ViewID);
+        if(photonView.IsMine)
+            photonView.RPC("RPCCatch", RpcTarget.All, unit.photonView.ViewID);
     }
 
     [PunRPC]

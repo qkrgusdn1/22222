@@ -21,6 +21,7 @@ public class PhotonMgr : MonoBehaviourPunCallbacks
     {
         return PhotonNetwork.IsConnectedAndReady && PhotonNetwork.InLobby;
     }
+
     private void Awake()
     {
         PhotonNetwork.SendRate = 30;
@@ -28,8 +29,10 @@ public class PhotonMgr : MonoBehaviourPunCallbacks
         instance = this;
         DontDestroyOnLoad(gameObject);
     }
-
+    public bool result;
+    public bool lose;
     public string nickName;
+    
 
     private void Start()
     {

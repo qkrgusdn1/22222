@@ -77,6 +77,13 @@ MonoBehaviour:
   - RPCTurnPointInstantiate
   - RPCSetTurnPoint
   - RPCZoneUnit
+  - RPCNoZoneUnit
+  - RPCCatched
+  - RPCUpdateTimer
+  - RPCResult
+  - RPCSpawnPlayer
+  - RPCSetPlayer
+  - RPCSetReSpawnPlayer
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

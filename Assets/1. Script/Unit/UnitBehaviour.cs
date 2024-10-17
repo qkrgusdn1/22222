@@ -25,6 +25,7 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
     {
         if (unitState == UnitState.Idle)
         {
+            unit.target = null;
             unit.animator.SetBool("IsKnockDown", false);
             unit.agent.isStopped = true;
             unit.agent.velocity = new Vector3(0, unit.rb.velocity.y, 0);
@@ -95,7 +96,7 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
                 {
                     float distance = Vector3.Distance(transform.position, col.transform.position);
 
-                    if (targetPhotonView.Owner != PhotonNetwork.LocalPlayer || targetPhotonView.IsMine)
+                    if (targetPhotonView.Owner != PhotonNetwork.LocalPlayer || targetPhotonView.IsMine || PhotonNetwork.IsMasterClient)
                     {
                         if (distance < closestDistance)
                         {
@@ -108,15 +109,17 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
 
             if (closestTarget != null)
             {
-                targetPhotonView = closestTarget.GetComponent<PhotonView>();
-                int targetViewID = targetPhotonView.ViewID;
-                photonView.RPC("RPCSetTarget", RpcTarget.All, targetViewID);
+                SetNewTarget(closestTarget);
                 unit.EnterState(UnitState.Approach);
                 return;
             }
         }
     }
-    
+    private void SetNewTarget(GameObject newTarget)
+    {
+        targetPhotonView = newTarget.GetComponent<PhotonView>();
+        photonView.RPC("RPCSetTarget", RpcTarget.All, targetPhotonView.ViewID);
+    }
     [PunRPC]
     public void RPCSetTarget(int targetID)
     {

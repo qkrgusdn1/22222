@@ -31,9 +31,19 @@ public class GameMgr : MonoBehaviourPunCallbacks
     public TMP_Text spawnCountText;
     int spawnCount;
     public int maxSpawnCount;
+    int dieSpawnCount;
+    public int maxDieSpawnCount;
     public GameObject selectSpawnCanvas;
     public SelectButton currentSelectButton;
     public CinemachineVirtualCamera virtualCamera;
+    public TMP_Text timerText;
+    public int minute;
+    public int second;
+    public GameObject resultPanel;
+    public TMP_Text resultText;
+    public GameObject diePanel;
+    public TMP_Text dieCountText;
+
     private void Start()
     {
         AudioMgr.Instance.waitingMusic.gameObject.SetActive(false);
@@ -43,9 +53,36 @@ public class GameMgr : MonoBehaviourPunCallbacks
         GameObject characterObj = PhotonNetwork.Instantiate("Character", Vector3.zero, Quaternion.identity);
         character = characterObj.GetComponent<Character>();
         if (PhotonNetwork.IsMasterClient)
+        {
             StartCoroutine(CountDown());
+        }
+            
     }
 
+
+    public IEnumerator CoGoResultScene()
+    {
+        Debug.Log("CoGoResultScene");
+        yield return new WaitForSeconds(5);
+        if(photonView.IsMine)
+            PhotonNetwork.LoadLevel("Result");
+    }
+    public IEnumerator DieCountDown()
+    {
+        Debug.Log("DieCountDown");
+        dieSpawnCount = maxDieSpawnCount;
+        while (dieSpawnCount > -1)
+        {
+            dieCountText.text = dieSpawnCount.ToString();
+            yield return new WaitForSeconds(1);
+            dieSpawnCount--;
+        }
+        player.die = false;
+        player.animator.Play("Idle");
+        diePanel.gameObject.SetActive(false);
+        player.transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
+        photonView.RPC("RPCSetReSpawnPlayer", RpcTarget.All);
+    }
     IEnumerator CountDown()
     {
         spawnCount = maxSpawnCount;
@@ -66,6 +103,58 @@ public class GameMgr : MonoBehaviourPunCallbacks
         AudioMgr.Instance.lobbyMusic.gameObject.SetActive(false);
         selectSpawnCanvas.SetActive(false);
         character.StartGame(spawnPoints[spawnPointIdx].transform.position);
+        StartCoroutine(CoTimer());
+    }
+    
+    IEnumerator CoTimer()
+    {
+        while (true)
+        {
+            yield return new WaitForSeconds(1);
+            second--;
+            if (second <= 0)
+            {
+                second = 59;
+                minute--;
+            }
+            if(minute <= -1)
+            {
+                break;
+            }
+            photonView.RPC("RPCUpdateTimer", RpcTarget.All);
+        }
+        if (photonView.IsMine)
+        {
+            photonView.RPC("RPCResult", RpcTarget.All);
+        }
+    }
+    [PunRPC]
+    public void RPCResult()
+    {
+        PhotonMgr.Instance.result = true;
+        if (PhotonMgr.Instance.lose)
+        {
+            resultText.text = "ÆÐ¹è";
+        }
+        else
+        {
+            resultText.text = "½Â¸®";
+        }
+        resultPanel.SetActive(true);
+        StartCoroutine(CoGoResultScene());
+    }
+    [PunRPC]
+    public void RPCUpdateTimer()
+    {
+        timerText.text = minute + ":" + second.ToString("00");
+    }
+
+    [PunRPC]
+    public void RPCSetReSpawnPlayer()
+    {
+        player.hp = player.maxHp;
+        player.hpBar.fillAmount = 1;
+        player.outHpBar.fillAmount = 1;
     }
 
     [PunRPC]
