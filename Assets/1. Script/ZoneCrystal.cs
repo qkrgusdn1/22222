@@ -36,28 +36,25 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
         hp = maxHp;
         hpBar.fillAmount = 1;
         hpBarSecondImage.fillAmount = 1;
-        if (GameMgr.Instance.player != player)
+        for (int i = 0; i < zone.units.Count; i++)
         {
-            for (int i = 0; i < zone.units.Count; i++)
+            if (zone.units[i] != null)
             {
-                if (zone.units[i] != null)
+                zone.units[i].hp = zone.units[i].maxHp;
+                zone.units[i].hpBar.fillAmount = 1;
+                player.Catch(zone.units[i]);
+
+                if (player.photonView.IsMine)
                 {
-                    zone.units[i].hp = zone.units[i].maxHp;
-                    zone.units[i].hpBar.fillAmount = 1;
-                    zone.units[i].EnterState(UnitState.Idle);
-                }
-            }
-        }
-        else
-        {
-            for (int i = 0; i < zone.units.Count; i++)
-            {
-                if(zone.units[i] != null)
-                {
-                    player.Catch(zone.units[i]);
                     gameObject.layer = LayerMask.NameToLayer("Friendly");
                     hpBar.color = Color.green;
                 }
+                else
+                {
+                    gameObject.layer = LayerMask.NameToLayer("Enemy");
+                    hpBar.color = Color.white;
+                }
+                
             }
         }
         zone.units.Clear();
@@ -80,6 +77,10 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
             {
                 StopCoroutine(smoothHpBar);
                 smoothHpBar = null;
+            }
+            if (PhotonNetwork.IsMasterClient)
+            {
+                photonView.RPC("RPCHpZero", RpcTarget.All, viewID);
             }
         }
     }
