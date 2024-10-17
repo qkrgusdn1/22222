@@ -76,10 +76,6 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
         smoothHpBar = StartCoroutine(CoSmoothHpBar(hpBar.fillAmount, 1));
         if (hp <= 0)
         {
-            if (PhotonNetwork.IsMasterClient)
-            {
-                photonView.RPC("RPCHpZero", RpcTarget.All, viewID);
-            }
             if (smoothHpBar != null)
             {
                 StopCoroutine(smoothHpBar);

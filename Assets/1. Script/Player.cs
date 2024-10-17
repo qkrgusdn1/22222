@@ -68,7 +68,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     [HideInInspector]
     public bool IsStop;
     bool noFinshAttack;
-    bool onSlope;
+    //bool onSlope;
 
     public float rollSpeed;
     private bool isRoll;
@@ -531,7 +531,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
     private void OnCollisionStay(Collision collision)
     {
-        onSlope = true;
+        //onSlope = true;
         if ((groundLayer.value & (1 << collision.gameObject.layer)) > 0)
         {
             foreach (ContactPoint contact in collision.contacts)
@@ -540,7 +540,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
                 {
                     isGrounded = true;
                     isJumping = false;
-                    onSlope = false;
+                    //onSlope = false;
                     break;
                 }
             }
@@ -614,7 +614,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
     void Move()
     {
-        if (onSlope) return;
+        //if (onSlope) return;
 
         if (isRoll) return;
 
