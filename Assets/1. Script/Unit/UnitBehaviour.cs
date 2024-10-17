@@ -115,7 +115,7 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
             }
         }
     }
-    private void SetNewTarget(GameObject newTarget)
+    public void SetNewTarget(GameObject newTarget)
     {
         targetPhotonView = newTarget.GetComponent<PhotonView>();
         photonView.RPC("RPCSetTarget", RpcTarget.All, targetPhotonView.ViewID);

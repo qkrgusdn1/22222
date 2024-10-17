@@ -8,74 +8,81 @@ public class WildUnitBehaviour : UnitBehaviour
 {
     public override void UpdateApproachState()
     {
-        if (unit.zoneUnit && unit.target != null)
+        if(unit.curUnitBehaviour.unitBehaviourType == UnitBehaviourType.Wild)
         {
-            float dis = Vector3.Distance(unit.zone.transform.position, unit.target.transform.position);
-            if (dis > unit.zone.zoneRange)
+            if (unit.zoneUnit && unit.target != null)
             {
-                unit.EnterState(UnitState.Turn);
-                return;
+                float dis = Vector3.Distance(unit.zone.transform.position, unit.target.transform.position);
+                if (dis > unit.zone.zoneRange)
+                {
+                    unit.EnterState(UnitState.Turn);
+                    return;
+                }
             }
+            base.UpdateApproachState();
         }
-        base.UpdateApproachState();
+        
     }
 
     public override void UpdateTurnState()
     {
-        if (unit.zoneUnit)
+        if (unit.curUnitBehaviour.unitBehaviourType == UnitBehaviourType.Wild)
         {
-            if(unit.target == null)
+            if (unit.zoneUnit)
             {
-                if (Vector3.Distance(unit.transform.position, unit.turnPoint) <= 0.5f)
+                if (unit.target == null)
                 {
-                    unit.target = null;
-                    unit.EnterState(UnitState.Idle);
-                    return;
-                }
-                return;
-            }
-            float dis = Vector3.Distance(unit.zone.transform.position, unit.target.transform.position);
-            if (dis > unit.zone.zoneRange)
-            {
-                if (Vector3.Distance(unit.transform.position, unit.turnPoint) <= 0.5f)
-                {
-                    unit.target = null;
-                    unit.EnterState(UnitState.Idle);
-                    return;
-                }
-                return;
-            }
-            if (unit.target != null && Vector3.Distance(unit.transform.position, unit.target.transform.position) <= unit.targetingRange)
-            {
-                Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
-
-                if (cols.Length > 0)
-                {
-                    GameObject closestTarget = null;
-                    float closestDistance = Mathf.Infinity;
-
-                    foreach (Collider col in cols)
+                    if (Vector3.Distance(unit.transform.position, unit.turnPoint) <= 0.5f)
                     {
-                        float distance = Vector3.Distance(transform.position, col.transform.position);
-                        if (distance < closestDistance)
+                        unit.target = null;
+                        unit.EnterState(UnitState.Idle);
+                        return;
+                    }
+                    return;
+                }
+                float dis = Vector3.Distance(unit.zone.transform.position, unit.target.transform.position);
+                if (dis > unit.zone.zoneRange)
+                {
+                    if (Vector3.Distance(unit.transform.position, unit.turnPoint) <= 0.5f)
+                    {
+                        unit.target = null;
+                        unit.EnterState(UnitState.Idle);
+                        return;
+                    }
+                    return;
+                }
+                if (unit.target != null && Vector3.Distance(unit.transform.position, unit.target.transform.position) <= unit.targetingRange)
+                {
+                    Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
+
+                    if (cols.Length > 0)
+                    {
+                        GameObject closestTarget = null;
+                        float closestDistance = Mathf.Infinity;
+
+                        foreach (Collider col in cols)
                         {
-                            closestDistance = distance;
-                            closestTarget = col.gameObject;
+                            float distance = Vector3.Distance(transform.position, col.transform.position);
+                            if (distance < closestDistance)
+                            {
+                                closestDistance = distance;
+                                closestTarget = col.gameObject;
+                            }
+                        }
+
+                        if (closestTarget != null)
+                        {
+                            unit.targetPhotonView = closestTarget.GetComponent<PhotonView>();
+                            int targetViewID = unit.targetPhotonView.ViewID;
+                            photonView.RPC("RPCSetTarget", RpcTarget.All, targetViewID);
+                            unit.EnterState(UnitState.Approach);
+                            return;
                         }
                     }
 
-                    if (closestTarget != null)
-                    {
-                        targetPhotonView = closestTarget.GetComponent<PhotonView>();
-                        int targetViewID = targetPhotonView.ViewID;
-                        photonView.RPC("RPCSetTarget", RpcTarget.All, targetViewID);
-                        unit.EnterState(UnitState.Approach);
-                        return;
-                    }
+                    unit.EnterState(UnitState.Approach);
+                    return;
                 }
-                
-                unit.EnterState(UnitState.Approach);
-                return;
             }
         }
     }

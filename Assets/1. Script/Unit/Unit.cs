@@ -75,6 +75,8 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
     public Vector3 turnPoint;
 
     public Player ownerPlayer;
+
+    public PhotonView targetPhotonView;
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
@@ -97,6 +99,7 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
         agent.speed = moveSpeed;
     }
 
+
     private void InitializeUnit()
     {
         unitBehaviours = GetComponentsInChildren<UnitBehaviour>();
@@ -108,7 +111,6 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
         EnterState(UnitState.Idle);
         animator.SetBool("IsKnockDown", false);
     }
-
     public UnitBehaviour GetUnitBehaviour(UnitBehaviourType type)
     {
         unitBehaviourType = type;
@@ -219,7 +221,8 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
             direction.y = 0;
             Quaternion lookRotation = Quaternion.LookRotation(direction);
             body.transform.rotation = Quaternion.Slerp(body.transform.rotation, lookRotation, Time.deltaTime * 100);
-        }else if(unitState == UnitState.Turn && zoneUnit)
+        }else if(unitState == UnitState.Turn && zoneUnit || 
+            curUnitBehaviour.unitBehaviourType == UnitBehaviourType.Reguler && ((RegularUnitBehaviour)curUnitBehaviour).curRole.type == RegularUnitRoleType.Defender && unitState == UnitState.Turn)
         {
             agent.SetDestination(turnPoint);
             Vector3 direction = (turnPoint - transform.position).normalized;
@@ -310,14 +313,12 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
         else
         {
             Debug.Log("Reguler");
-            GameObject player = PhotonView.Find(selectingPlayerId).gameObject;
             curUnitBehaviour = GetUnitBehaviour(UnitBehaviourType.Reguler);
-            curUnitBehaviour.GetComponent<UnitBehaviour>().PlayerSetting(player.GetComponent<Player>());
             hpBar.color = Color.green;
 
             photonView.RPC("RPCNoZoneUnit", RpcTarget.All);
             RegularUnitBehaviour regularUnitBehaviour = (RegularUnitBehaviour)curUnitBehaviour;
-            regularUnitBehaviour.OnClickedChangeRegularUnitStateBtn(RegularUnitState.Defender.ToString());
+            regularUnitBehaviour.OnClickedChangeRegularUnitStateBtn(RegularUnitRoleType.Defender.ToString());
         }
     }
     [PunRPC]

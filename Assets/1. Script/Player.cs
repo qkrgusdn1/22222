@@ -452,9 +452,6 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
             currentUnit = null;
             return;
         }
-
-
-
         if (currentUnit != null)
             currentUnit.curUnitBehaviour.UpdateFKeyImage(false);
         currentUnit = cols[targetIdx].GetComponent<Unit>();
@@ -469,18 +466,21 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
             }
             else if (currentUnit.curUnitBehaviour.unitBehaviourType == UnitBehaviourType.Reguler)
             {
-                if (activeStateBg)
+                if(currentUnit.ownerPlayer == this)
                 {
-                    currentUnit.regularStateBg.SetActive(false);
-                    activeStateBg = false;
-                    IsStop = false;
-                    Cursor.lockState = CursorLockMode.Locked;
-                    Cursor.visible = false;
-                }
-                else
-                {
-                    currentUnit.regularStateBg.SetActive(true);
-                    OnRegularUnitState();
+                    if (activeStateBg)
+                    {
+                        currentUnit.regularStateBg.SetActive(false);
+                        activeStateBg = false;
+                        IsStop = false;
+                        Cursor.lockState = CursorLockMode.Locked;
+                        Cursor.visible = false;
+                    }
+                    else
+                    {
+                        currentUnit.regularStateBg.SetActive(true);
+                        OnRegularUnitState();
+                    }
                 }
             }
         }

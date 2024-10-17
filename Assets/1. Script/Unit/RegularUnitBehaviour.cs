@@ -3,22 +3,16 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.UI;
 using UnityEngine.UI;
 
 public class RegularUnitBehaviour : UnitBehaviour
 {
-
-    public RegularUnitState regularUnitState;
-
     public float stopRange;
 
-    public string regularStateName;
+    public RegularUnitRole curRole;
+    public RegularUnitRole[] regularUnitRoles;
 
-    private void Start()
-    {
-        regularStateName = "사수";
-        unit.regularStateText.text = "현재 유닛 상태 " + regularStateName;
-    }
 
     private void OnDrawGizmosSelected()
     {
@@ -26,31 +20,32 @@ public class RegularUnitBehaviour : UnitBehaviour
         Gizmos.DrawWireSphere(unit.rangePoint.transform.position, stopRange);
     }
 
+    private void Start()
+    {
+        for(int i = 0; i< regularUnitRoles.Length; i++)
+        {
+            regularUnitRoles[i].regularUnitBehaviour = this;
+        }
+    }
 
-   
     private void Update()
     {
+        if (unit.unitBehaviourType == UnitBehaviourType.Wild)
+            return;
+
         if (unit.die)
             return;
 
-        if(unit.unitState == UnitState.KnockDown)
+        if (unit.unitState == UnitState.KnockDown)
+            return;
+
+        if(unit.ownerPlayer != null && !unit.ownerPlayer.photonView.IsMine)
         {
-            regularUnitState = RegularUnitState.KnockDown;
+            return;
         }
 
-        if(player != null && regularUnitState != RegularUnitState.Defender && regularUnitState != RegularUnitState.KnockDown)
-        {
-            float playerdis = Vector3.Distance(unit.rangePoint.transform.position, player.transform.position);
-            if (playerdis <= stopRange)
-            {
-                unit.EnterState(UnitState.Idle);
-                return;
-            }
-            else if (playerdis > stopRange)
-            {
-                unit.EnterState(UnitState.Approach);
-            }
-        }
+        if(curRole != null)
+            curRole.UpdateRole();
     }
 
     public void OnClickedChangeRegularUnitStateBtn(string regularStateBtnName)
@@ -60,113 +55,51 @@ public class RegularUnitBehaviour : UnitBehaviour
     [PunRPC]
     public void RPCOnClickedChangeRegularUnitStateBtn(string regularStateBtnName)
     {
-        if (regularUnitState == RegularUnitState.KnockDown)
+        if (Enum.TryParse(regularStateBtnName, out RegularUnitRoleType role))
         {
-            regularStateName = "기절";
-            return;
+            for(int i = 0; i < regularUnitRoles.Length; i++)
+            {
+                if (regularUnitRoles[i].type == role)
+                {
+                    curRole = regularUnitRoles[i];
+                    break;
+                }
+            }
         }
 
-        if (Enum.TryParse(regularStateBtnName, out RegularUnitState state))
-        {
-            regularUnitState = state;
-        }
-        if (regularUnitState == RegularUnitState.Follow)
-        {
-            unit.EnterState(UnitState.Approach);
-            regularStateName = "따라오기";
-        }
-        else if (regularUnitState == RegularUnitState.Guard)
-        {
-            unit.EnterState(UnitState.Approach);
-            regularStateName = "경호";
-        }
-        else if (regularUnitState == RegularUnitState.Defender)
-        {
-            unit.EnterState(UnitState.Idle);
-            unit.turnPoint = transform.position;
-            regularStateName = "사수";
-        }
+        curRole.EnterRole();
 
-        unit.regularStateText.text = "현재 유닛 상태 : " + regularStateName;
+        unit.regularStateText.text = "현재 아군 상태 : " + curRole.type;
     }
+
+
 
     public override void UpdateAttackState()
     {
-        if (unit.hp / unit.maxHp <= 0.2f)
-        {
-            unit.EnterState(UnitState.KnockDown);
-        }
-        if (distanceToPlayer > unit.attackRange)
-        {
-            if (unit.endAttack)
-            {
-                unit.attackTimer = 0;
-                unit.EnterState(UnitState.Approach);
-                unit.agent.isStopped = false;
-            }
-            return;
-        }
-        unit.attackTimer -= Time.deltaTime;
+        
+    }
 
-        if (unit.attackTimer <= 0)
-        {
-            if (Vector3.Distance(transform.position, unit.turnPoint) > 0.5f && unit.target == null && regularUnitState == RegularUnitState.Defender)
-            {
-                unit.agent.isStopped = false;
-                unit.EnterState(UnitState.Approach);
-                return;
-            }
-            else
-            {
-                unit.EnterState(UnitState.Idle);
-                return;
-            }
-        }
+    public override void UpdateIdleState()
+    {
+        
+    }
+
+    public override void UpdateTurnState()
+    {
+       
     }
 
     public override void UpdateApproachState()
     {
-        if(regularUnitState == RegularUnitState.KnockDown)
-        {
-            return;
-        }
-        if(regularUnitState == RegularUnitState.Follow)
-        {
-            Debug.Log("Follow");
-            unit.animator.SetBool("IsRunning", true);
-
-            return;
-        }
-        if (regularUnitState == RegularUnitState.Guard && unit.target == null)
-        {
-            Debug.Log("Guard");
-            unit.animator.SetBool("IsRunning", true);
-            return;
-        }
-        else if (regularUnitState == RegularUnitState.Defender)
-        {
-            Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
-            Debug.Log("Defender");
-            if (cols.Length <= 0)
-            {
-                Debug.Log("MoveTrunPoint");
-                unit.EnterState(UnitState.Turn);
-                return;
-            }
-            
-        }
-
-        base.UpdateApproachState();
+    
     }
 
 
 }
 
-public enum RegularUnitState
+public enum RegularUnitRoleType
 {
     Guard,
     Defender,
     Follow,
-    KnockDown,
-    None
 }

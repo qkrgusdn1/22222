@@ -11,7 +11,7 @@ public class ChangeStateBtn : MonoBehaviour
 
     private void Update()
     {
-        stateText.text = "현재 아군 상태 : " + regularUnitBehaviour.regularStateName;
+        stateText.text = "현재 아군 상태 : " + regularUnitBehaviour.curRole.type;
     }
 
     public void ChangeState(RegularUnitBehaviour regularUnitBehaviour)
