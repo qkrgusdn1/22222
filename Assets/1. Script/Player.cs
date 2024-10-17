@@ -100,6 +100,8 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
     Unit currentUnit;
 
+    public GameObject FighterObject { get => gameObject;}
+
     private void Awake()
     {
         inventory = GetComponentInChildren<Inventory>();

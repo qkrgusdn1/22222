@@ -77,6 +77,8 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
     public Player ownerPlayer;
 
     public PhotonView targetPhotonView;
+
+    public GameObject FighterObject => gameObject;
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
@@ -172,7 +174,10 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
     public void Attack(Fighter target, float damage)
     {
         if (target != null)
+        {
             target.TakeDamage(damage, photonView.ViewID);
+        }
+            
     }
     public void AttackStart()
     {
@@ -212,6 +217,8 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
 
         if (!PhotonNetwork.IsMasterClient)
             return;
+
+        
         body.transform.position = transform.position;
         if(unitState == UnitState.Approach && target != null)
         {
@@ -304,27 +311,21 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
     [PunRPC]
     public void RPCCatched(int selectingPlayerId)
     {
+        zoneUnit = false;
+        zone = null;
+        curUnitBehaviour = GetUnitBehaviour(UnitBehaviourType.Reguler);
         if (selectingPlayerId != GameMgr.Instance.player.GetComponent<PhotonView>().ViewID)
         {
-            Debug.Log("Wild");
-            curUnitBehaviour = GetUnitBehaviour(UnitBehaviourType.Wild);
             hpBar.color = Color.white;
         }
         else
         {
-            Debug.Log("Reguler");
-            curUnitBehaviour = GetUnitBehaviour(UnitBehaviourType.Reguler);
             hpBar.color = Color.green;
-
+            
             photonView.RPC("RPCNoZoneUnit", RpcTarget.All);
             RegularUnitBehaviour regularUnitBehaviour = (RegularUnitBehaviour)curUnitBehaviour;
             regularUnitBehaviour.OnClickedChangeRegularUnitStateBtn(RegularUnitRoleType.Defender.ToString());
         }
-    }
-    [PunRPC]
-    public void RPCNoZoneUnit()
-    {
-        zoneUnit = false;
     }
 
 }

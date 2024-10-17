@@ -13,6 +13,8 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
     Coroutine smoothHpBar;
     Zone zone;
 
+    public GameObject FighterObject => gameObject;
+
     public void Start()
     {
         hp = maxHp;
@@ -58,6 +60,7 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
                 }
             }
         }
+        zone.units.Clear();
     }
 
     [PunRPC]
