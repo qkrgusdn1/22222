@@ -5,15 +5,12 @@ using UnityEngine;
 
 public class GuardRegularUnitRole : RegularUnitRole
 {
-    public override void EnterRole()
-    {
-        unit.turnPoint = unit.transform.position;
-    }
 
     public override void UpdateRole()
     {
         if (unit.unitState == UnitState.Idle)
         {
+            unit.animator.SetBool("IsRunning", false);
             Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
             if (cols.Length > 0)
             {
@@ -46,25 +43,29 @@ public class GuardRegularUnitRole : RegularUnitRole
                     return;
                 }
             }
+            else if(cols.Length <= 0)
+            {
+                regularUnitBehaviour.SetNewTarget(unit.ownerPlayer.gameObject);
+                float distanceToOwnerPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.ownerPlayer.transform.position);
+                if (distanceToOwnerPlayer > unit.attackRange)
+                {
+                    unit.EnterState(UnitState.Approach);
+                }
+            }
             
         }
         else if (unit.unitState == UnitState.Approach)
         {
             Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
-            
-            if (cols.Length <= 0)
-            {
-                unit.target = unit.ownerPlayer.gameObject;
 
-                float distanceToOwnerPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.ownerPlayer.transform.position);
-                if(distanceToOwnerPlayer < unit.attackRange)
-                {
-                    unit.target = null;
-                    unit.EnterState(UnitState.Idle);
-                }
+            float distanceToOwnerPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.ownerPlayer.transform.position);
+            if (distanceToOwnerPlayer < unit.attackRange)
+            {
+                unit.target = null;
+                unit.EnterState(UnitState.Idle);
                 return;
             }
-            else
+            if (cols.Length <= 0)
             {
                 unit.agent.isStopped = false;
                 unit.animator.SetBool("IsRunning", true);
@@ -72,13 +73,8 @@ public class GuardRegularUnitRole : RegularUnitRole
                 if (unit.target != null)
                 {
                     distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
-                    if (distanceToPlayer > unit.targetingRange)
-                    {
-                        unit.target = null;
-                        unit.EnterState(UnitState.Idle);
-                        return;
-                    }
-                    else if (distanceToPlayer < unit.attackRange)
+
+                    if (distanceToPlayer < unit.attackRange)
                     {
                         unit.endAttack = false;
                         unit.EnterState(UnitState.Attack);

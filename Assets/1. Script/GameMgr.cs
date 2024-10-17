@@ -1,6 +1,7 @@
 using Cinemachine;
 using Photon.Pun;
 using Photon.Pun.Demo.PunBasics;
+using Photon.Realtime;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -44,6 +45,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
     public GameObject diePanel;
     public TMP_Text dieCountText;
 
+    int zoneAmount;
     private void Start()
     {
         AudioMgr.Instance.waitingMusic.gameObject.SetActive(false);
@@ -81,7 +83,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
         player.animator.Play("Idle");
         diePanel.gameObject.SetActive(false);
         player.transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
-        photonView.RPC("RPCSetReSpawnPlayer", RpcTarget.All);
+        photonView.RPC("RPCSetReSpawnPlayer", RpcTarget.All, player.photonView.ViewID);
     }
     IEnumerator CountDown()
     {
@@ -123,10 +125,22 @@ public class GameMgr : MonoBehaviourPunCallbacks
             }
             photonView.RPC("RPCUpdateTimer", RpcTarget.All);
         }
-        if (photonView.IsMine)
+        for (int i = 0; i < zones.Length; i++)
         {
-            photonView.RPC("RPCResult", RpcTarget.All);
+            if (zones[i].possessions == true)
+            {
+                zoneAmount++;
+            }
         }
+        if (zoneAmount >= 2)
+        {
+            PhotonMgr.Instance.lose = true;
+        }
+        else if (zoneAmount < 2)
+        {
+            PhotonMgr.Instance.lose = false;
+        }
+        photonView.RPC("RPCResult", RpcTarget.All);
     }
     [PunRPC]
     public void RPCResult()
@@ -150,11 +164,18 @@ public class GameMgr : MonoBehaviourPunCallbacks
     }
 
     [PunRPC]
-    public void RPCSetReSpawnPlayer()
+    public void RPCSetReSpawnPlayer(int playerViewID)
     {
+        Player player = PhotonView.Find(playerViewID).GetComponent<Player>();
+        player.animator.Play("Idle");
+        player.rb.isKinematic = false;
+        player.mainCollider.enabled = true;
+        player.rollCollider.enabled = false;
         player.hp = player.maxHp;
         player.hpBar.fillAmount = 1;
+        player.hpBarSecondImage.fillAmount = 1;
         player.outHpBar.fillAmount = 1;
+        player.outHpBarSecondImage.fillAmount = 1;
     }
 
     [PunRPC]

@@ -6785,6 +6785,7 @@ MonoBehaviour:
   friendlyLayer:
     serializedVersion: 2
     m_Bits: 512
+  rb: {fileID: 0}
   checkPickUpRange: 2
   hand: {fileID: 7715586849362441658}
   inventoryBg: {fileID: 6929497006841350173}

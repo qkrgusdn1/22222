@@ -5,7 +5,6 @@ using UnityEngine;
 
 public class DefenderRegularUnitRole : RegularUnitRole
 {
-    
     public override void EnterRole()
     {
         unit.turnPoint = unit.transform.position;

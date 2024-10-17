@@ -31,10 +31,8 @@ public class FriendlyBtn : MonoBehaviour
         {
             if (mine)
                 inventory.friendlyHpText.text = "Hp : " + unit.hp.ToString() + "/" + maxHpText;
-            if (unit == null)
-            {
+            if(unit == null  || unit.ownerPlayer.photonView.ViewID != GameMgr.Instance.player.photonView.ViewID)
                 Destroy(gameObject);
-            }
         }
 
     }

@@ -117,6 +117,7 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
     }
     public void SetNewTarget(GameObject newTarget)
     {
+        Debug.Log("SetNewTarget");
         targetPhotonView = newTarget.GetComponent<PhotonView>();
         photonView.RPC("RPCSetTarget", RpcTarget.All, targetPhotonView.ViewID);
     }
@@ -213,7 +214,18 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
     {
         if (unitBehaviourType == UnitBehaviourType.Reguler)
         {
-            unit.fKeyImage.gameObject.SetActive(active);
+            if(unit.ownerPlayer.photonView.ViewID == GameMgr.Instance.player.photonView.ViewID)
+            {
+                unit.fKeyImage.gameObject.SetActive(active);
+            }
+            else
+            {
+                if(unit.unitState == UnitState.KnockDown)
+                {
+                    unit.catchBarImage.fillAmount = 0;
+                    unit.catchBarBgImage.SetActive(active);
+                }
+            }
         }
         else if (unitBehaviourType == UnitBehaviourType.Wild)
         {

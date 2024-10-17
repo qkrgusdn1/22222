@@ -2207,6 +2207,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9139847290632534534}
   - component: {fileID: 7926796035018776772}
+  - component: {fileID: 8560817632676639237}
   m_Layer: 8
   m_Name: Guard
   m_TagString: Untagged
@@ -2245,6 +2246,28 @@ MonoBehaviour:
   type: 0
   unit: {fileID: 0}
   regularUnitBehaviour: {fileID: 0}
+--- !u!114 &8560817632676639237
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3344349107363161004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &3358532084554197589
 GameObject:
   m_ObjectHideFlags: 0
@@ -3272,6 +3295,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9180781337374651505}
   - component: {fileID: 3117345573367430776}
+  - component: {fileID: 6725054607924819837}
   m_Layer: 8
   m_Name: Defender
   m_TagString: Untagged
@@ -3310,6 +3334,28 @@ MonoBehaviour:
   type: 1
   unit: {fileID: 0}
   regularUnitBehaviour: {fileID: 0}
+--- !u!114 &6725054607924819837
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5800841296141222214}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &5926558597782652070
 GameObject:
   m_ObjectHideFlags: 0
@@ -3474,7 +3520,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 5926558597782652070}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.7
+  m_Radius: 0.5
   m_Speed: 4
   m_Acceleration: 8
   avoidancePriority: 50
@@ -4549,6 +4595,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7291707092797271069}
   - component: {fileID: 5862378538852409402}
+  - component: {fileID: 2266086141298994308}
   m_Layer: 8
   m_Name: Follow
   m_TagString: Untagged
@@ -4587,6 +4634,28 @@ MonoBehaviour:
   type: 2
   unit: {fileID: 0}
   regularUnitBehaviour: {fileID: 0}
+--- !u!114 &2266086141298994308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7511545416877295597}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa584fbee541324448dd18d8409c7a41, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ObservedComponentsFoldoutOpen: 1
+  Group: 0
+  prefixField: -1
+  Synchronization: 3
+  OwnershipTransfer: 0
+  observableSearch: 2
+  ObservedComponents: []
+  sceneViewId: 0
+  InstantiationId: 0
+  isRuntimeInstantiated: 0
 --- !u!1 &7600878470053889513
 GameObject:
   m_ObjectHideFlags: 0

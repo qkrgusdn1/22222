@@ -59,7 +59,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     public LayerMask itemLayer;
     public LayerMask enemyLayer;
     public LayerMask friendlyLayer;
-    Rigidbody rb;
+    public Rigidbody rb;
     public float checkPickUpRange;
 
     public GameObject hand;
@@ -190,13 +190,16 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
         if (hp <= 0)
         {
             die = true;
+            mainCollider.enabled = false;
+            rollCollider.enabled = false;
+            rb.isKinematic = true;
             animator.Play("Die");
         }
     }
 
     void Die()
     {
-        if (photonView.IsMine && die)
+        if (photonView.IsMine)
         {
             GameMgr.Instance.diePanel.SetActive(true);
             StartCoroutine(GameMgr.Instance.DieCountDown());
@@ -258,6 +261,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
     public void EndRoll()
     {
+
         mainCollider.enabled = true;
         rollCollider.enabled = false;
     }
@@ -270,6 +274,9 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
             return;
         if (PhotonMgr.Instance.result)
             return;
+
+        bodyTr.position = transform.position;
+
         if (stopAttackTime > 0 && !noFinshAttack)
         {
             stopAttackTime -= Time.deltaTime;
@@ -461,12 +468,13 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
         if (Input.GetKeyDown(KeyCode.F))
         {
-            if (currentUnit.unitState == UnitState.KnockDown && currentUnit.curUnitBehaviour.unitBehaviourType == UnitBehaviourType.Wild)
+            if (currentUnit.unitState == UnitState.KnockDown && currentUnit.curUnitBehaviour.unit.ownerPlayer.photonView.ViewID != GameMgr.Instance.player.photonView.ViewID || 
+                currentUnit.unitState == UnitState.KnockDown && currentUnit.curUnitBehaviour.unit.ownerPlayer == null)
             {
                 catchTarget = currentUnit;
                 catchTimer = 0;
             }
-            else if (currentUnit.curUnitBehaviour.unitBehaviourType == UnitBehaviourType.Reguler)
+            else if (currentUnit.curUnitBehaviour.unitBehaviourType == UnitBehaviourType.Reguler && currentUnit.curUnitBehaviour.unit.ownerPlayer.photonView.ViewID == GameMgr.Instance.player.photonView.ViewID)
             {
                 if(currentUnit.ownerPlayer == this)
                 {

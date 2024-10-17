@@ -38,11 +38,7 @@ public class RegularUnitBehaviour : UnitBehaviour
 
         if (unit.unitState == UnitState.KnockDown)
             return;
-
-        if(unit.ownerPlayer != null && !unit.ownerPlayer.photonView.IsMine)
-        {
-            return;
-        }
+        
 
         if(curRole != null)
             curRole.UpdateRole();
@@ -91,7 +87,7 @@ public class RegularUnitBehaviour : UnitBehaviour
 
     public override void UpdateApproachState()
     {
-    
+
     }
 
 

@@ -11,7 +11,7 @@ public class Zone : MonoBehaviourPunCallbacks
     public List<Unit> units = new List<Unit>();
     public float zoneRange;
     public GameObject canvas;
-
+    public bool possessions;
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;

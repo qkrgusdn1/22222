@@ -10,6 +10,7 @@ using TMPro;
 using Photon.Pun;
 using System;
 using Photon.Realtime;
+using System.Security.Cryptography.X509Certificates;
 
 public class Unit : MonoBehaviourPunCallbacks, Fighter
 {
@@ -125,10 +126,10 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
         }
         else if(type == UnitBehaviourType.Reguler)
         {
-            turnPoint = transform.position;
-            targetLayer = LayerMask.GetMask("Enemy");
-            gameObject.layer = LayerMask.NameToLayer("Friendly");
-            weapon.hitLayerMask = targetLayer;
+            if (photonView.IsMine)
+            {
+                photonView.RPC("RPCSetUnitLayer", RpcTarget.All);
+            }
         }
 
         for(int i = 0; i < unitBehaviours.Length; i++)
@@ -139,6 +140,24 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
             }
         }
         return null;
+    }
+    [PunRPC]
+    public void RPCSetUnitLayer()
+    {
+        if (ownerPlayer.photonView.ViewID == GameMgr.Instance.player.photonView.ViewID)
+        {
+            turnPoint = transform.position;
+            targetLayer = LayerMask.GetMask("Enemy");
+            gameObject.layer = LayerMask.NameToLayer("Friendly");
+            weapon.hitLayerMask = targetLayer;
+        }
+        else
+        {
+            turnPoint = transform.position;
+            targetLayer = LayerMask.GetMask("Friendly");
+            gameObject.layer = LayerMask.NameToLayer("Enemy");
+            weapon.hitLayerMask = targetLayer;
+        }
     }
 
     public virtual void EnterState(UnitState state)
@@ -208,6 +227,12 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
 
     void Die()
     {
+        photonView.RPC("RPCDie", RpcTarget.All);
+    }
+
+    [PunRPC]
+    public void RPCDie()
+    {
         Destroy(gameObject);
     }
 
@@ -276,9 +301,9 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
         StartCoroutine(CoSmoothHpBar(hpBar.fillAmount, 1));
         if (hp <= 0)
         {
+            hp = 0;
             die = true;
             animator.Play("Die");
-            
         }
     }
     public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
@@ -300,6 +325,7 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
         catchBarBgImage.SetActive(false);
         hpBar.fillAmount = 1;
         EnterState(UnitState.Idle);
+        animator.SetBool("IsRunning", false);
         animator.SetBool("IsKnockDown", false);
         agent.isStopped = false;
 
@@ -317,12 +343,12 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
         if (selectingPlayerId != GameMgr.Instance.player.GetComponent<PhotonView>().ViewID)
         {
             hpBar.color = Color.white;
+            targetLayer = LayerMask.GetMask("Friendly");
+            gameObject.layer = LayerMask.NameToLayer("Enemy");
         }
         else
         {
             hpBar.color = Color.green;
-            
-            photonView.RPC("RPCNoZoneUnit", RpcTarget.All);
             RegularUnitBehaviour regularUnitBehaviour = (RegularUnitBehaviour)curUnitBehaviour;
             regularUnitBehaviour.OnClickedChangeRegularUnitStateBtn(RegularUnitRoleType.Defender.ToString());
         }
