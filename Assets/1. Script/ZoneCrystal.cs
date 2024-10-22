@@ -12,6 +12,8 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
     public Image hpBarSecondImage;
     Coroutine smoothHpBar;
     Zone zone;
+    public Material redMaterial;
+    public Material greenMaterial;
 
     public GameObject FighterObject => gameObject;
 
@@ -31,8 +33,9 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
     [PunRPC]
     public void RPCHpZero(int viewID)
     {
-        Player player = PhotonNetwork.GetPhotonView(viewID).GetComponent<Player>();
+        Fighter hitter = PhotonNetwork.GetPhotonView(viewID).GetComponent<Fighter>();
 
+        Player player;
         hp = maxHp;
         hpBar.fillAmount = 1;
         hpBarSecondImage.fillAmount = 1;
@@ -42,19 +45,33 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
             {
                 zone.units[i].hp = zone.units[i].maxHp;
                 zone.units[i].hpBar.fillAmount = 1;
-                player.Catch(zone.units[i]);
+                if (hitter.FighterObject.CompareTag("Unit"))
+                {
+                    player = hitter.FighterObject.GetComponent<Unit>().ownerPlayer;
+                    player.Catch(zone.units[i]);
+                }
+                else if (hitter.FighterObject.CompareTag("Player"))
+                {
+                    player = hitter.FighterObject.GetComponent<Player>();
+                    player.Catch(zone.units[i]);
+                }
+                
 
-                if (player.photonView.IsMine)
+                if (hitter.FighterObject.GetComponent<PhotonView>().IsMine)
                 {
                     zone.possessions = true;
                     gameObject.layer = LayerMask.NameToLayer("Friendly");
                     hpBar.color = Color.green;
+                    GetComponent<Renderer>().material = greenMaterial;
+                    GameMgr.Instance.crystalBarMine.fillAmount += 1 / 3;
                 }
                 else
                 {
                     zone.possessions = false;
                     gameObject.layer = LayerMask.NameToLayer("Enemy");
                     hpBar.color = Color.white;
+                    GetComponent<Renderer>().material = redMaterial;
+                    GameMgr.Instance.crystalBarMine.fillAmount -= 1 / 3;
                 }
             }
         }

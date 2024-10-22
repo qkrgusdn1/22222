@@ -45,6 +45,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
     public GameObject diePanel;
     public TMP_Text dieCountText;
 
+    public Image crystalBarMine;
     int zoneAmount;
     private void Start()
     {
@@ -79,7 +80,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
             yield return new WaitForSeconds(1);
             dieSpawnCount--;
         }
-        player.die = false;
+        
         player.animator.Play("Idle");
         diePanel.gameObject.SetActive(false);
         player.transform.position = spawnPoints[Random.Range(0, spawnPoints.Length)].transform.position;
@@ -167,7 +168,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
     public void RPCSetReSpawnPlayer(int playerViewID)
     {
         Player player = PhotonView.Find(playerViewID).GetComponent<Player>();
-        player.animator.Play("Idle");
+        player.die = false;
         player.rb.isKinematic = false;
         player.mainCollider.enabled = true;
         player.rollCollider.enabled = false;
