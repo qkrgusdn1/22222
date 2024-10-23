@@ -3374,7 +3374,7 @@ GameObject:
   - component: {fileID: 2771465728777761467}
   m_Layer: 8
   m_Name: Assassin
-  m_TagString: Untagged
+  m_TagString: Unit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

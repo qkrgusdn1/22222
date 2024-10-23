@@ -181,7 +181,7 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
 
             if (state == UnitState.Idle)
             {
-                target = null;
+                curUnitBehaviour.SetNewTarget(null);
             }
 
             if (state == UnitState.Attack)

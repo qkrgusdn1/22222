@@ -7,6 +7,11 @@ public class DefenderRegularUnitRole : RegularUnitRole
 {
     public override void EnterRole()
     {
+        photonView.RPC("RPCEnterRole", RpcTarget.All);
+    }
+    [PunRPC]
+    public void RPCEnterRole()
+    {
         unit.turnPoint = unit.transform.position;
     }
 
@@ -59,8 +64,7 @@ public class DefenderRegularUnitRole : RegularUnitRole
                 distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
                 if (distanceToPlayer > unit.targetingRange)
                 {
-                    unit.target = null;
-                    unit.EnterState(UnitState.Idle);
+                    regularUnitBehaviour.SetNewTarget(null);
                     return;
                 }
                 else if (distanceToPlayer < unit.attackRange)
@@ -105,7 +109,7 @@ public class DefenderRegularUnitRole : RegularUnitRole
             {
                 if (Vector3.Distance(unit.transform.position, unit.turnPoint) <= 0.5f)
                 {
-                    unit.target = null;
+                    regularUnitBehaviour.SetNewTarget(null);
                     unit.EnterState(UnitState.Idle);
                     return;
                 }

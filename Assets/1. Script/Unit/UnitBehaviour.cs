@@ -12,6 +12,7 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
     public Player player;
     public bool targetting;
     public PhotonView targetPhotonView;
+    bool isTargetChange;
     private void Awake()
     {
         unit = GetComponentInParent<Unit>();
@@ -25,7 +26,7 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
     {
         if (unitState == UnitState.Idle)
         {
-            unit.target = null;
+            SetNewTarget(null);
             unit.animator.SetBool("IsKnockDown", false);
             unit.agent.isStopped = true;
             unit.agent.velocity = new Vector3(0, unit.rb.velocity.y, 0);
@@ -117,23 +118,38 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
     }
     public void SetNewTarget(GameObject newTarget)
     {
-        Debug.Log("SetNewTarget");
-        targetPhotonView = newTarget.GetComponent<PhotonView>();
-        photonView.RPC("RPCSetTarget", RpcTarget.All, targetPhotonView.ViewID);
+        if (!isTargetChange && (targetPhotonView == null || targetPhotonView.gameObject != newTarget))
+        {
+            targetPhotonView = newTarget?.GetComponent<PhotonView>();
+            if (targetPhotonView != null)
+            {
+                photonView.RPC("RPCSetTarget", RpcTarget.All, targetPhotonView.ViewID);
+            }
+            else
+            {
+                photonView.RPC("RPCSetTarget", RpcTarget.All, -1);
+            }
+        }
     }
     [PunRPC]
     public void RPCSetTarget(int targetID)
     {
-        GameObject target = PhotonView.Find(targetID).gameObject;
-        if (target != null)
+        isTargetChange = true;
+
+        if (targetID == -1)
         {
-            unit.target = target;
-            Debug.Log($"[RPC] Target set to: {target.name} (ViewID: {targetID})");
+            unit.target = null;
         }
         else
         {
-            unit.EnterState(UnitState.Idle);
+            GameObject target = PhotonView.Find(targetID)?.gameObject;
+            if (target != null)
+            {
+                unit.target = target;
+            }
         }
+
+        isTargetChange = false;
     }
 
     public virtual void UpdateApproachState()
@@ -146,7 +162,7 @@ public abstract class UnitBehaviour : MonoBehaviourPunCallbacks
             distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
             if (distanceToPlayer > unit.targetingRange)
             {
-                unit.target = null;
+                SetNewTarget(null);
                 if (!unit.zoneUnit)
                 {
                     unit.EnterState(UnitState.Idle);

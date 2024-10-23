@@ -34,7 +34,7 @@ public class WildUnitBehaviour : UnitBehaviour
                 {
                     if (Vector3.Distance(unit.transform.position, unit.turnPoint) <= 0.5f)
                     {
-                        unit.target = null;
+                        SetNewTarget(null);
                         unit.EnterState(UnitState.Idle);
                         return;
                     }
@@ -45,7 +45,7 @@ public class WildUnitBehaviour : UnitBehaviour
                 {
                     if (Vector3.Distance(unit.transform.position, unit.turnPoint) <= 0.5f)
                     {
-                        unit.target = null;
+                        SetNewTarget(null);
                         unit.EnterState(UnitState.Idle);
                         return;
                     }

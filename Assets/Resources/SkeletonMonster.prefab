@@ -1965,7 +1965,7 @@ GameObject:
   - component: {fileID: 1897238982355713817}
   m_Layer: 8
   m_Name: SkeletonMonster
-  m_TagString: Untagged
+  m_TagString: Unit
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

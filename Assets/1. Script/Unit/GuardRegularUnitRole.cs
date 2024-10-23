@@ -58,18 +58,12 @@ public class GuardRegularUnitRole : RegularUnitRole
         {
             Collider[] cols = Physics.OverlapSphere(transform.position, unit.targetingRange, unit.targetLayer);
 
-            float distanceToOwnerPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.ownerPlayer.transform.position);
-            if (distanceToOwnerPlayer < unit.attackRange)
+           
+            unit.agent.isStopped = false;
+            unit.animator.SetBool("IsRunning", true);
+            if (cols.Length > 0)
             {
-                unit.target = null;
-                unit.EnterState(UnitState.Idle);
-                return;
-            }
-            if (cols.Length <= 0)
-            {
-                unit.agent.isStopped = false;
-                unit.animator.SetBool("IsRunning", true);
-
+                regularUnitBehaviour.SetNewTarget(cols[0].gameObject);
                 if (unit.target != null)
                 {
                     distanceToPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.target.transform.position);
@@ -84,6 +78,18 @@ public class GuardRegularUnitRole : RegularUnitRole
                 else
                 {
                     unit.EnterState(UnitState.Idle);
+                    return;
+                }
+            }
+            else if(cols.Length <= 0)
+            {
+                regularUnitBehaviour.SetNewTarget(unit.ownerPlayer.gameObject);
+                float distanceToOwnerPlayer = Vector3.Distance(unit.rangePoint.transform.position, unit.ownerPlayer.transform.position);
+                if (distanceToOwnerPlayer < unit.attackRange && cols.Length <= 0)
+                {
+                    regularUnitBehaviour.SetNewTarget(null);
+                    unit.EnterState(UnitState.Idle);
+                    return;
                 }
             }
         }

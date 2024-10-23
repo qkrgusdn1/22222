@@ -59,6 +59,7 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
 
                 if (hitter.FighterObject.GetComponent<PhotonView>().IsMine)
                 {
+                    Debug.Log("hitter");
                     zone.possessions = true;
                     gameObject.layer = LayerMask.NameToLayer("Friendly");
                     hpBar.color = Color.green;
@@ -67,6 +68,7 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
                 }
                 else
                 {
+                    Debug.Log("hitter");
                     zone.possessions = false;
                     gameObject.layer = LayerMask.NameToLayer("Enemy");
                     hpBar.color = Color.white;
