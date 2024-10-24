@@ -15,6 +15,7 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
     public Material redMaterial;
     public Material greenMaterial;
 
+
     public GameObject FighterObject => gameObject;
 
     public void Start()
@@ -34,7 +35,6 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
     public void RPCHpZero(int viewID)
     {
         Fighter hitter = PhotonNetwork.GetPhotonView(viewID).GetComponent<Fighter>();
-
         Player player;
         hp = maxHp;
         hpBar.fillAmount = 1;
@@ -64,7 +64,6 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
                     gameObject.layer = LayerMask.NameToLayer("Friendly");
                     hpBar.color = Color.green;
                     GetComponent<Renderer>().material = greenMaterial;
-                    GameMgr.Instance.crystalBarMine.fillAmount += 1 / 3;
                 }
                 else
                 {
@@ -73,7 +72,6 @@ public class ZoneCrystal : MonoBehaviourPunCallbacks, Fighter
                     gameObject.layer = LayerMask.NameToLayer("Enemy");
                     hpBar.color = Color.white;
                     GetComponent<Renderer>().material = redMaterial;
-                    GameMgr.Instance.crystalBarMine.fillAmount -= 1 / 3;
                 }
             }
         }

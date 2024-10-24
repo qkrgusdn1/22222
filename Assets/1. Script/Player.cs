@@ -272,7 +272,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
             return;
         if (die)
             return;
-        if (PhotonMgr.Instance.result)
+        if (GameMgr.Instance.result)
             return;
 
         bodyTr.position = transform.position;

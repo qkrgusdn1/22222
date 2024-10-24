@@ -29,7 +29,6 @@ public class PhotonMgr : MonoBehaviourPunCallbacks
         instance = this;
         DontDestroyOnLoad(gameObject);
     }
-    public bool result;
     public bool lose;
     public string nickName;
     

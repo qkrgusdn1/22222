@@ -44,8 +44,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
     public TMP_Text resultText;
     public GameObject diePanel;
     public TMP_Text dieCountText;
-
-    public Image crystalBarMine;
+    public bool result;
     int zoneAmount;
     private void Start()
     {
@@ -55,11 +54,8 @@ public class GameMgr : MonoBehaviourPunCallbacks
         AudioMgr.Instance.lobbyMusic.gameObject.SetActive(false);
         GameObject characterObj = PhotonNetwork.Instantiate("Character", Vector3.zero, Quaternion.identity);
         character = characterObj.GetComponent<Character>();
-        if (PhotonNetwork.IsMasterClient)
-        {
-            StartCoroutine(CountDown());
-        }
-            
+       
+        StartCoroutine(CountDown());
     }
 
 
@@ -67,8 +63,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
     {
         Debug.Log("CoGoResultScene");
         yield return new WaitForSeconds(5);
-        if(photonView.IsMine)
-            PhotonNetwork.LoadLevel("Result");
+        PhotonNetwork.LoadLevel("Result");
     }
     public IEnumerator DieCountDown()
     {
@@ -91,11 +86,14 @@ public class GameMgr : MonoBehaviourPunCallbacks
         spawnCount = maxSpawnCount;
         while (spawnCount > -1)
         {
-            photonView.RPC("RPCUpdateCountdown", RpcTarget.All, spawnCount);
+            if (PhotonNetwork.IsMasterClient)
+            {
+                photonView.RPC("RPCUpdateCountdown", RpcTarget.All, spawnCount);
+            }
             yield return new WaitForSeconds(1);
-            spawnCount--;
         }
-        photonView.RPC("RPCStartGame", RpcTarget.All);
+        if(photonView.IsMine)
+            photonView.RPC("RPCStartGame", RpcTarget.All);
     }
     [PunRPC]
     public void RPCStartGame()
@@ -114,8 +112,8 @@ public class GameMgr : MonoBehaviourPunCallbacks
         while (true)
         {
             yield return new WaitForSeconds(1);
-            second--;
-            if (second <= 0)
+                
+            if (second <= -1)
             {
                 second = 59;
                 minute--;
@@ -124,29 +122,30 @@ public class GameMgr : MonoBehaviourPunCallbacks
             {
                 break;
             }
-            photonView.RPC("RPCUpdateTimer", RpcTarget.All);
-        }
-        for (int i = 0; i < zones.Length; i++)
-        {
-            if (zones[i].possessions == true)
-            {
-                zoneAmount++;
-            }
-        }
-        if (zoneAmount >= 2)
-        {
-            PhotonMgr.Instance.lose = true;
-        }
-        else if (zoneAmount < 2)
-        {
-            PhotonMgr.Instance.lose = false;
+            if (PhotonNetwork.IsMasterClient)
+                photonView.RPC("RPCUpdateTimer", RpcTarget.All);
         }
         photonView.RPC("RPCResult", RpcTarget.All);
     }
     [PunRPC]
     public void RPCResult()
     {
-        PhotonMgr.Instance.result = true;
+        for (int i = 0; i < zones.Length; i++)
+        {
+            if (zones[i].possessions)
+            {
+                zoneAmount++;
+            }
+        }
+        if (zoneAmount >= 2)
+        {
+            PhotonMgr.Instance.lose = false;
+        }
+        else if (zoneAmount < 2)
+        {
+            PhotonMgr.Instance.lose = true;
+        }
+        result = true;
         if (PhotonMgr.Instance.lose)
         {
             resultText.text = "ÆÐ¹è";
@@ -162,6 +161,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
     public void RPCUpdateTimer()
     {
         timerText.text = minute + ":" + second.ToString("00");
+        second--;
     }
 
     [PunRPC]
@@ -183,6 +183,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
     public void RPCUpdateCountdown(int remainingTime)
     {
         spawnCountText.text = remainingTime.ToString();
+        spawnCount--;
     }
 
 }
