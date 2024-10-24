@@ -46,6 +46,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
     public TMP_Text dieCountText;
     public bool result;
     int zoneAmount;
+
     private void Start()
     {
         AudioMgr.Instance.waitingMusic.gameObject.SetActive(false);
@@ -173,6 +174,7 @@ public class GameMgr : MonoBehaviourPunCallbacks
         player.mainCollider.enabled = true;
         player.rollCollider.enabled = false;
         player.hp = player.maxHp;
+        player.noFinshAttack = false;
         player.hpBar.fillAmount = 1;
         player.hpBarSecondImage.fillAmount = 1;
         player.outHpBar.fillAmount = 1;

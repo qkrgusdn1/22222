@@ -79,7 +79,11 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
 
     public PhotonView targetPhotonView;
 
+    public bool isBoss;
+
     public GameObject FighterObject => gameObject;
+
+    public string attackName;
     private void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
@@ -198,16 +202,19 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
         }
             
     }
-    public void AttackStart()
+    public virtual void AttackStart()
     {
         animator.SetBool("IsRunning", false);
         attackTimer = maxAttackTimer;
-        photonView.RPC("RPCCrossFadeAttack", RpcTarget.All, attackAmount);
+        if(photonView.IsMine)
+            photonView.RPC("RPCCrossFadeAttack", RpcTarget.All, attackAmount, attackName);
     }
     [PunRPC]
-    public void RPCCrossFadeAttack(int attackAmount)
+    public void RPCCrossFadeAttack(int attackAmount, string attackName)
     {
-        animator.CrossFade("Attack" + attackAmount, 0.1f);
+        animator.CrossFade(attackName + attackAmount, 0.1f);
+        if(isBoss)
+            this.attackAmount++;
     }
 
     public void StartAttack()
@@ -220,7 +227,7 @@ public class Unit : MonoBehaviourPunCallbacks, Fighter
         weapon.EndAttack();
     }
 
-    public void FinishAttack()
+    public virtual void FinishAttack()
     {
         endAttack = true;
     }

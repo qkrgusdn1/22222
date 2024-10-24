@@ -6790,6 +6790,7 @@ MonoBehaviour:
   hand: {fileID: 7715586849362441658}
   inventoryBg: {fileID: 6929497006841350173}
   IsStop: 0
+  noFinshAttack: 0
   rollSpeed: 7
   rollDuration: 1.2
   attackAmount: 0

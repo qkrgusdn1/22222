@@ -3461,6 +3461,8 @@ MonoBehaviour:
   turnPoint: {x: 0, y: 0, z: 0}
   ownerPlayer: {fileID: 0}
   targetPhotonView: {fileID: 0}
+  isBoss: 0
+  attackName: Attack
 --- !u!136 &684338821514662603
 CapsuleCollider:
   m_ObjectHideFlags: 0

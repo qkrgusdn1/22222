@@ -67,7 +67,7 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
     public GameObject inventoryBg;
     [HideInInspector]
     public bool IsStop;
-    bool noFinshAttack;
+    public bool noFinshAttack;
     //bool onSlope;
 
     public float rollSpeed;
@@ -261,7 +261,6 @@ public class Player : MonoBehaviourPunCallbacks, Fighter
 
     public void EndRoll()
     {
-
         mainCollider.enabled = true;
         rollCollider.enabled = false;
     }
